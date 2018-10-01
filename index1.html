@@ -1,0 +1,112 @@
+<html>
+
+<head></head>
+
+<body>
+    <div>
+        <span>useraccount</span>
+        <input id="useraccount" placeholder="email or phone">
+        <span>password</span>
+        <input id="password" placeholder="password">
+        <button id="login">login</button>
+        <p id="loginContent"></p>
+    </div>
+    <div>
+        <span>username</span>
+        <input id="username" placeholder="User name">
+        <span>email</span>
+        <input id="email" placeholder="email">
+        <span>phone</span>
+        <input id="phone" placeholder="phone">
+        <span>password</span>
+        <input id="Rpassword" placeholder="password">
+        <button id="register">register</button>
+        <p id="registerContent"></p>
+    </div>
+    <div>
+        <p id="newContent"></p>
+    </div>
+    <div>
+        <input id="newID" placeholder="news id">
+        <div id="newsDetail"></div>
+        <button id="getNews">get</button>
+        <p id="newDetail"></p>
+    </div>
+    <div>
+        <button id="getNewsCount">
+            count
+        </button>
+        <p id="newsCount"></p>
+    </div>
+</body>
+<script>
+    const ip = 'http://127.0.0.1:3020/'
+    // const ip = 'http://112.74.165.209:3020/'
+
+    function ajax(url, method, data, callback) {
+        const xmlHTTP = new XMLHttpRequest();
+        xmlHTTP.open(method, url, true);
+        xmlHTTP.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+        xmlHTTP.setRequestHeader("Access-Control-Allow-Credentials", "true")
+        xmlHTTP.send(data);
+        xmlHTTP.onreadystatechange = callback
+    }
+    document.getElementById('login').onclick = () => {
+        var login = {
+            userAccount: document.getElementById('useraccount').value,
+            password: document.getElementById('password').value
+        }
+        login = JSON.stringify(login)
+        ajax(ip + 'login', 'post', login, (data) => {
+            if (data.srcElement.readyState == 4) {
+                console.log(data.srcElement.response)
+                document.getElementById('loginContent').innerHTML = data.srcElement.response;
+            }
+        })
+        console.log(login);
+    }
+    // 
+    ajax(ip + 'selectAllNews', 'post', null, (data) => {
+        
+        document.getElementById('newContent').innerHTML = data.srcElement.response;
+        let cookie = document.cookie;
+        console.log(cookie,data)
+    });
+    document.getElementById('register').onclick = () => {
+        var register = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('Rpassword').value,
+            iphone: document.getElementById('phone').value,
+            email: document.getElementById('email').value,
+        }
+        // console.log(register);
+        register = JSON.stringify(register);
+        ajax(ip + 'register', 'post', register, (data) => {
+            if (data.srcElement.readyState == 4) {
+                console.log(data.srcElement.response)
+                document.getElementById('register').innerHTML = data.srcElement.response;
+            }
+        })
+    }
+    document.getElementById('getNews').onclick = () => {
+        ajax(ip + 'newsDetial', 'post', JSON.stringify({ newID: document.getElementById('newID').value }), (data) => {
+            if (data.srcElement.readyState == 4) {
+                console.log(data.srcElement.response)
+                document.getElementById('newDetail').innerHTML = data.srcElement.response;
+            }
+        })
+    }
+    document.getElementById('getNewsCount').onclick = () => {
+        ajax(ip + 'getNewsCount', 'post', null, (data) => {
+            if (data.srcElement.readyState == 4) {
+                console.log(JSON.parse(data.srcElement.response).result)
+                let result = JSON.parse(data.srcElement.response).result;
+                for (let i = 0; i < result.length; i++) {
+                    document.getElementById('newsCount').innerHTML += result[i].news_kind + '类新闻有' + result[i].kinds_of_count + '个 <br/>';
+                }
+            }
+        })
+    }
+</script>
+
+</html>

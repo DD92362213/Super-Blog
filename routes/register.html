@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .container {
+            font-family: '微软雅黑';
+            display: flex;
+            justify-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .register {
+            display: flex;
+            flex: 0;
+            width: 30%;
+            height: 70%;
+            min-width: 400px;
+            min-height: 550px;
+            flex-direction: column;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(34, 34, 34, 0.3);
+            padding-bottom:2%; 
+        }
+
+        div {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+        }
+
+        input {
+            height: 34px;
+            width: 80%;
+            border-radius: 17px;
+            border: 1px solid rgba(34, 34, 34, .25);
+            outline: none;
+            /* padding-left:2em;  */
+            text-indent: 2em;
+        }
+
+        input:focus,
+        input:hover {
+            box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.3);
+        }
+
+        button:hover {
+            box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.3);
+            cursor: pointer;
+        }
+
+        button {
+            height: 34px;
+            width: 80%;
+            border-radius: 17px;
+            border: 1px solid rgba(34, 34, 34, .25);
+            outline: none;
+            padding: 0 2em 0 2em;
+            background-color: rgba(34, 34, 34, 0);
+        }
+
+        h1 {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="register">
+            <h1>
+                Join in us
+            </h1>
+            <div>
+                <input id="username" placeholder="Your name">
+            </div>
+            <div>
+                <input type="password" id="password" placeholder="Your password">
+            </div>
+            <div>
+                <input type="password" id="rePassword" placeholder="Refirm password">
+            </div>
+            <div>
+                <input id="phone" placeholder="Your call-number">
+            </div>
+            <div>
+                <input id="email" placeholder="Your e-mail">
+            </div>
+            <div>
+                <button id="register">register</button>
+            </div>
+            <div>
+                <button id="cancel">console</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../js/ajax.js"></script>
+<script>
+    var ip = 'http://127.0.0.1:3020/';
+    document.getElementById('register').addEventListener('click',() => {
+        var register = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            iphone: document.getElementById('phone').value,
+            email: document.getElementById('email').value,
+        }
+        // console.log(register);
+        register = JSON.stringify(register);
+        ajax(ip + 'register', 'post', register, (data) => {
+            if (data.srcElement.readyState == 4) {
+                window.location.href = ip;
+            }
+        })
+    })
+</script>
+
+</html>
