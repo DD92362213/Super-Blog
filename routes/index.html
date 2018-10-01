@@ -12,6 +12,7 @@
 
 <body>
     <div class="container">
+
         <div class="left">
             <div class="callBox">
                 <p>Call Us</p>
@@ -22,21 +23,53 @@
             <div class="user">
 
             </div>
-            <div>
+            <div class="">
 
             </div>
-
         </div>
+
     </div>
 </body>
 <script src="../js/ajax.js"></script>
+<script src="../js/cookie_tools.js"></script>
 <script>
     var ip = 'http://127.0.0.1:3020/';
+    var event = new eventEmitter(); //from ajax.js
     ajax(ip + "getLogin", 'get', null, function (data) {
+        let user = document.querySelector('.user');
+        let right = document.querySelector('.right');
+        let left = document.querySelector('.left');
         if (data.srcElement.readyState == 4) {
-            document.querySelector('.user').innerHTML = data.srcElement.response;
+            user.innerHTML = data.srcElement.response;
+            event.emit('create', { flag: 1, right: right });
         }
-    })
+    });
+    event.on('create', function (data) {
+        if (data.flag == 1) {
+            document.getElementById('login').addEventListener('click', function () {
+                var login = {
+                    userAccount: document.getElementById('useraccount').value,
+                    password: document.getElementById('password').value
+                }
+                login = JSON.stringify(login);
+                ajax(ip + 'login', 'post', login, (data1) => {
+                    if (data1.srcElement.readyState == 4) {
+                        console.log(data1.srcElement)
+                        if (getCookieItem('loginFlag') == '1') {
+                            let container = document.querySelector('.container');
+                            // window.location.href = ip + 'index'
+                            // console.log(data.element)
+                            container.classList.add('loginAnimation')
+                            setTimeout(function () {
+                                container.classList.add('loginFinish');
+                                data.right.innerHTML = '<div class="contentBox">' + data1.srcElement.response + '</div>';
+                            }, 750);
+                        }
+                    }
+                });
+            });
+        }
+    });
 </script>
 
 </html>

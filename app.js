@@ -6,8 +6,6 @@ var mysql = require('mysql');
 var fs = require('fs');
 var cookieParse = require('cookie-parser');
 var ipAddress = '127.0.0.1';
-// var staticSource = "/root/android_server"
-// var staticSource = "C:/Users/79263/Desktop/android_server"
 var connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
@@ -20,16 +18,16 @@ var urlencodeParser = bodyParser.urlencoded({
 app.use(bodyParser.json())
 app.use(cookieParse());
 app.use(express.static(__dirname));
-let initPage = app.get('/', function (req, res) {
-    res.sendFile("login.html", { root: __dirname + "/routes" });
+app.get('/', function (req, res) {
+    res.sendFile("index.html", { root: __dirname + "/routes" });
 });
 app.get('/index', function (req, res) {
-    res.sendFile("index.html", { root: __dirname + "/routes" });
+    res.sendFile("test.txt", { root: __dirname + "/blog_content" });
 });
 app.get('/getLogin',function(req,res){
     let loginDom = `<div class="login">
     <h1>
-        User Login
+        Sign in
     </h1>
     <div>
         <input id="useraccount" placeholder="email or phone">
