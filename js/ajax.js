@@ -24,4 +24,4 @@ eventEmitter.prototype.emit = function(event,...data){
             item(...data);
         })
     }
-} 
+}
