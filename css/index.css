@@ -8,6 +8,7 @@ body{
     display: flex;
 }
 .left{
+    background-size: cover;
     height: 100%;
     width: 65%;
     display: flex;
@@ -28,12 +29,20 @@ body{
     bottom: 0px;
     right: 0px;
     overflow: hidden;
+    background-size: cover;
     background-image: url(../img/bgc.png);
     background-position: center;
     /* background-size: 200% 200%; */
     z-index: 5;
     filter: blur(5px);
     -webkit-filter: blur(5px);
+}
+.profile_photo{
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: red;
+ 
 }
 .callBox p{
     color: #fff;
@@ -53,4 +62,6 @@ body{
     width: 100%;
     display: flex;
     justify-content: center;
+ 
 }
+

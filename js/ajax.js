@@ -6,3 +6,22 @@ function ajax(url, method, data, callback) {
     xmlHTTP.send(data);
     xmlHTTP.onreadystatechange = callback
 }
+function eventEmitter(){
+    if(!this.handler){
+        this.handler = {};
+    }
+}
+eventEmitter.prototype.on = function(event,callback){
+    if(!this.handler[event]){
+        this.handler[event] = [];
+    }
+    this.handler[event].push(callback);
+}
+eventEmitter.prototype.emit = function(event,...data){
+    console.log(data);
+    if(this.handler[event].length != 0){
+        this.handler[event].map(function(item){
+            item(...data);
+        })
+    }
+} 

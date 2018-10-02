@@ -55,3 +55,166 @@
     align-items: center;
     font-size: 2em;
 }
+
+/* ___________________________________________________________________________________________________________ */
+
+.con{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.botton{
+    display: flex;
+    flex: 0;
+    flex-basis: 30%;
+    width: 100%;
+    flex-direction:column;
+    min-width: 450px;
+}
+
+.select0{
+
+}
+
+.select{
+    margin-top: 15px;
+    display: flex;
+    flex-direction:row;
+    justify-content: space-around;
+}
+.select1{
+    margin-top: 15px;
+    display: flex;
+    flex-direction:row;
+    justify-content: center;
+}
+.text01{
+    display: flex;
+    flex-direction:column;
+
+}
+
+
+.visimg{
+    
+}
+.vis_img{
+    
+    opacity: 0.5;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid rgba(34, 34, 34, .25);
+    outline: none;
+    background-color: rgba(34, 34, 34, 0);
+}
+.visimg1{
+   
+    opacity: 0;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid rgba(34, 34, 34, .25);
+    outline: none;
+    background-color: rgba(34, 34, 34, 0);
+}
+.lea_img{
+    opacity: 0.5;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid rgba(34, 34, 34, .25);
+    outline: none;
+    background-color: rgba(34, 34, 34, 0);
+}
+.lea_img1{
+    
+    opacity: 0.5;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid rgba(34, 34, 34, .25);
+    outline: none;
+    background-color: rgba(34, 34, 34, 0);
+    transform:translateX(-30px);  
+    box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
+}
+
+.vis_img:hover{
+    box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
+    cursor: pointer;
+}
+.lea_img:hover{
+    box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
+    cursor: pointer;
+}
+
+.visitor{
+    opacity: 0; 
+    text-align: center;
+    margin-top: 45px;
+    font-size: 25px;
+    letter-spacing:2px ;  
+}
+.visitor_cg{
+    text-align: center;
+    margin-top: 45px;
+    font-size: 25px;
+    letter-spacing:2px ;  
+}
+.leaguer{ 
+    
+    opacity: 0; 
+    text-align: center;
+    margin-top: 45px;
+    font-size: 25px;
+    letter-spacing:2px ;   
+}
+.fad{
+    animation: fadeIn 1000ms;
+}
+.fadeOut{
+    animation:fadeOut 1000ms;
+}
+.disper{
+    animation:disper 1000ms;
+}
+.slid{
+    animation:slid 1000ms;
+}
+@keyframes fadeIn {
+    0% {
+    opacity: 0; /*初始状态 透明度为0*/
+    }
+    50% {
+    opacity: 0.5; /*中间状态 透明度为0*/
+    }
+    100% {
+    opacity: 1; /*结尾状态 透明度为1*/
+    }
+    }
+    @keyframes fadeOut {
+        0% {
+        opacity: 0.5; /*初始状态 透明度为0*/
+        }
+        50% {
+        opacity: 0.25; /*中间状态 透明度为0*/
+        }
+        100% {
+        opacity: 0; /*结尾状态 透明度为1*/
+        }
+        }
+
+
+@keyframes slid{
+    from{
+        transform:translateX(0);   
+    }
+    to{
+        transform:translateX(-98px); 
+        
+    }
+}
+.text1,.text2{
+
+}    
