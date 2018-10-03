@@ -7,7 +7,7 @@ var fs = require('fs');
 var cookieParse = require('cookie-parser');
 var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
-    host: '127.0.0.1:3306',
+    host: '127.0.0.1',
     user: 'root',
     password: '123456',
     database: 'test'
@@ -43,6 +43,35 @@ app.get('/getLogin',function(req,res){
     </div>
 </div>`
     res.send(loginDom);
+})
+app.get('/getRegister',function(req,res){
+    let registerDom = `<div class="register">
+    <h1>
+        Join in us
+    </h1>
+    <div>
+        <input id="username" placeholder="Your name">
+    </div>
+    <div>
+        <input type="password" id="password" placeholder="Your password">
+    </div>
+    <div>
+        <input type="password" id="rePassword" placeholder="Refirm password">
+    </div>
+    <div>
+        <input id="phone" placeholder="Your call-number">
+    </div>
+    <div>
+        <input id="email" placeholder="Your e-mail">
+    </div>
+    <div>
+        <button id="register">register<tton>
+    </div>
+    <div>
+        <button id="cancel">console<tton>
+    </div>
+</div>`
+    res.send(registerDom);
 })
 app.get('/register', function (req, res) {
     res.sendFile("register.html", { root: __dirname + "/routes" })
@@ -137,6 +166,209 @@ app.post('/getNewsCount', urlencodeParser, function (req, res) {
         }
     })
 })
+
+
+//文章增
+app.post('/setpassage',urlencodeParser,(req,res)=>{
+    let data = {
+        passage_title: req.body.passage_title,
+        passage_kind: req.body.passage_kind,
+        passage_id: null,
+        passage_url: req.body.passage_url,
+        passage_see: 0,
+        user_id: req.body.user_id,
+        day_see:0,
+    }
+    connection.query('insert into passage set ?', data, function (err, result) {
+        if (err) {
+            console.log(err);
+            res.json({
+                "flag": "0"
+            });
+        }
+        else {
+            res.json({
+                "flag": "1"
+            });
+        }
+    })
+})
+//文章删
+app.post('/delpassage',urlencodeParser,(req,res)=>{
+    let  id=req.body.user_id
+    connection.query('delete from passage where passage_id='+id, data, function (err, result) {
+        if (err) {
+            console.log(err);
+            res.json({
+                "flag": "0"
+            });
+        }
+        else {
+            res.json({
+                "flag": "1"
+            });
+        }
+    })
+})
+
+app.use(cookieParse());
+app.use(cookieSession({
+    name:'times',
+    keys:[],
+    maxAge:24*3600*1000
+}));
+//文章展示
+app.post('/titleList',(req,urlencodeParser,res)=>{
+    let u_id=req.body.user_id;
+    let msg=req.body.passage_msg;
+    let p_id= req.body.passage_id;
+    if(u_id){
+        connection.query('select passage_title,passage_id from passage where user_id = '+id, data, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json({
+                    "flag": "1"
+                });
+                res.send(data);
+            }
+        })
+    }else if(msg){
+        connection.query('select passage_title,passage_id from passage where passage_title like"%'+msg+'%"', data, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json({
+                    "flag": "1"
+                });
+                res.send(data);
+            }
+        })
+    }else if(p_id){
+        connection.query('select passage_url from passage where passage_id ='+p_id, data, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json({
+                    "flag": "1"
+                });
+                res.sendfile(data.passage_url);
+                req.session['passage_see']+=1;
+            }
+        })
+    }
+
+})
+
+//文章更新
+
+app.post('/updatapassage',urlencodeParser,(req,res)=>{
+    let  title=req.body.user_id;
+    let kind =req.body.passage_kind;
+    let url =req.body.passage_url;
+    let arr=[title,kind,url];
+    for(vari=0;i<arr.length;i++){
+        if(title){
+            connection.query('updata passage set passage_title= '+title, data, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json({
+                        "flag": "0"
+                    });
+                }
+                else {
+                    res.json({
+                        "flag": "1"
+                    });
+                    
+                }
+            })
+        }
+        if(kind){
+            connection.query('updata passage set passage_kind= '+title, data, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json({
+                        "flag": "0"
+                    });
+                }
+                else {
+                    res.json({
+                        "flag": "1"
+                    });
+                  
+                }
+            })
+        }
+        if(url){
+            connection.query('updata passage set passage_url= '+url, data, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json({
+                        "flag": "0"
+                    });
+                }
+                else {
+                    res.json({
+                        "flag": "1"
+                    });
+                   
+                }
+            })
+        }
+    }
+})
+
+
+
+
+app.use('/Wcloseupdata',urlencodeParser,function(req,res){
+    let p_id= req.body.passage_id;
+    pp.post('/updatapassage',urlencodeParser,(req,res)=>{
+        connection.query('select passage_see from passage where passage_id ='+p_id, data, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+               data.passage_see=tempsee;
+            }
+        })
+       setTimeout(function(){
+        connection.query('updata passage set passage_see= '+req.session['passage_see']+tempsee, data, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json({
+                    "flag": "1"
+                });
+               
+            }
+        })
+       },) 
+    
+});
+
+
+
 // app.use(bodyParser.json({ limit: '50mb' }));
 var server = app.listen(3020, function () {
     var host = server.address().address;

@@ -61,7 +61,7 @@
 .con{
     display: flex;
     justify-content: center;
-    width: 100%;
+    width: 35vw;
 }
 .botton{
     display: flex;
@@ -117,6 +117,10 @@
     border: 1px solid rgba(34, 34, 34, .25);
     outline: none;
     background-color: rgba(34, 34, 34, 0);
+}
+.visimg2{
+    box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
+  
 }
 .lea_img{
     opacity: 0.5;
