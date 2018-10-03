@@ -62,9 +62,12 @@ app.post('/login', urlencodeParser, function (req, res) {
                 // res.json({
                 //     flag:1
                 // })
-                res.cookie('username', result[0].user_name, {});
-                res.cookie('loginFlag', '1', {});
-                res.redirect("/index");
+                if(result.length != 0){
+                    res.cookie('username', result[0].user_name, {});
+                    res.cookie('loginFlag', '1', {});
+                    res.redirect("/index");
+                }
+                
             }
         });
     } else {

@@ -25,3 +25,14 @@ eventEmitter.prototype.emit = function(event,...data){
         })
     }
 }
+function debouncing(fn,waitTime){
+    let timer = undefined;
+    return function(){
+        let context = this;
+        let arg = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function(){
+            fn.apply(context,arg);
+        },waitTime);
+    }
+}

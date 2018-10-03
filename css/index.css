@@ -21,6 +21,7 @@ body{
     overflow: hidden;
     background-image: url(../img/bgc.png);
     background-position: center;
+    animation: leftBoxAction 1000ms;
     background-size: cover;
 }
 .left::before{
@@ -42,10 +43,31 @@ body{
     filter: blur(5px);
     -webkit-filter: blur(5px);
 }
+.callBox {
+    height: 100%;
+    width: 25vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 .callBox p{
     color: #fff;
     position: relative;
     z-index: 10;
+}
+.callBoxLogin{
+    animation: callBoxLogin 800ms;
+    position: relative;
+    z-index: 10; 
+}
+.callBoxLogined{
+    transform: translateX(20vw);
+    position: relative;
+    /* animation: callBoxLogined 200ms; */
+    z-index: 10;
+    transition: background-color 400ms;
+    background-color: rgba(0,0,0,.70);
 }
 .right{
     height: 100%;
@@ -61,6 +83,7 @@ body{
     z-index: 9;
     width: 35vw;
     display: flex;
+    animation: contentBoxAction 1000ms;
     justify-content: center;
 }
 .contentBox{
@@ -69,6 +92,7 @@ body{
     /* width: 100%; */
     height: 100%;
     padding-left: 10px;
+    animation: contentBoxAction 1000ms;
 }
 .loginFinish{
     width: 140vw;
@@ -76,6 +100,13 @@ body{
 }
 .loginAnimation{
     animation: login 800ms;
+}
+.userInfo{
+    /* height: 15vh; */
+    position: relative;
+    width: 100%;
+    padding: 0px 8px 0px 8px; 
+    z-index: 11;
 }
 @keyframes login{
     from{
@@ -91,5 +122,136 @@ body{
     }
     to{
         transform: translateX(-40vw);
+    }
+}
+@keyframes contentBoxAction {
+    from{
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+@-webkit-keyframes contentBoxAction {
+    from{
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+@keyframes leftBoxAction {
+    from{
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+@-webkit-keyframes leftBoxAction {
+    from{
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+@keyframes callBoxLogin{
+    from{
+        transform: translateX(0vw);
+    }
+    to{
+        transform: translateX(20vw);
+    }
+}
+@-webkit-keyframes callBoxLogin{
+    from{
+        transform: translateX(0vw);
+    }
+    to{
+        transform: translateX(20vw);
+    }
+}
+@keyframes callBoxLogined{
+    from{
+        background-color: rbga(0,0,0,0)
+    }
+    to{
+        background-color: rgba(0,0,0,.70)
+    }
+}
+@-webkit-keyframes callBoxLogined{
+    from{
+        background-color: rbga(0,0,0,0)
+    }
+    to{
+        background-color: rgba(0,0,0,.70)
+    }
+}
+.hiddenList{
+    display: none !important;
+}
+.passageList{
+    box-shadow: -5px 0px 5px rgba(255,255,255,.25);
+    align-self: flex-start;
+    position: relative;
+    height: 100%;
+    display: flex;
+    color: #fff;
+    font-family: '微软雅黑';
+    overflow: hidden;
+}
+.sliderBox{
+    flex-shrink: 0;
+    margin: 0px;
+    transition: margin-top 100ms;
+}
+.passageItem{
+    width: calc(25vw - 16px);
+    height: 110px;
+    padding: 8px;
+    flex-direction: column;
+    align-self: flex-start;
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,.25);
+    animation: passageItemAction 600ms;
+}
+
+.passageTitle,.passageKind,.passageInfo{
+    flex: 1;
+    display: flex;
+    align-items: center
+}
+.passageKind span {
+    font-size:14px; 
+    border-radius: 19px;
+    border: 1px solid rgba(255,255,255,.25);
+    padding: 5px
+}
+.passageTitle span,.passageInfo span{
+    flex:1;
+}
+@keyframes passageItemAction{
+    from{
+        transform: translateX(-40px);
+    }
+    to{
+        transform: translateX(0px);
+    }
+}
+@-webkit-keyframes passageItemAction{
+    from{
+        transform: translateX(-40px);
+    }
+    to{
+        transform: translateX(0px);
     }
 }

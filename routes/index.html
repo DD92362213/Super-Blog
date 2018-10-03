@@ -15,8 +15,28 @@
 
         <div class="left">
             <div class="callBox">
-                <p>Call Us</p>
-                <p>bornashes@gmail.com</p>
+                <div class="userInfo">
+                    <p>Call Us</p>
+                    <p>bornashes@gmail.com</p>
+                </div>
+                <div class="passageList hiddenList">
+                    <div class="sliderBox">
+                        <div class="passageItem">
+                            <div class="passageTitle">
+                                <span style="flex:3">Passage Title</span>
+                                <span>Author</span>
+                            </div>
+                            <div class="passageKind">
+                                    <span> Passage Kind</span>
+                            </div>
+                            <div class="passageInfo">
+                                <span style="flex:3">submit date</span>
+                                <span>good</span>
+                                <span>see</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="right">
@@ -32,44 +52,6 @@
 </body>
 <script src="../js/ajax.js"></script>
 <script src="../js/cookie_tools.js"></script>
-<script>
-    var ip = 'http://127.0.0.1:3020/';
-    var event = new eventEmitter(); //from ajax.js
-    ajax(ip + "getLogin", 'get', null, function (data) {
-        let user = document.querySelector('.user');
-        let right = document.querySelector('.right');
-        let left = document.querySelector('.left');
-        if (data.srcElement.readyState == 4) {
-            user.innerHTML = data.srcElement.response;
-            event.emit('create', { flag: 1, right: right });
-        }
-    });
-    event.on('create', function (data) {
-        if (data.flag == 1) {
-            document.getElementById('login').addEventListener('click', function () {
-                var login = {
-                    userAccount: document.getElementById('useraccount').value,
-                    password: document.getElementById('password').value
-                }
-                login = JSON.stringify(login);
-                ajax(ip + 'login', 'post', login, (data1) => {
-                    if (data1.srcElement.readyState == 4) {
-                        console.log(data1.srcElement)
-                        if (getCookieItem('loginFlag') == '1') {
-                            let container = document.querySelector('.container');
-                            // window.location.href = ip + 'index'
-                            // console.log(data.element)
-                            container.classList.add('loginAnimation')
-                            setTimeout(function () {
-                                container.classList.add('loginFinish');
-                                data.right.innerHTML = '<div class="contentBox">' + data1.srcElement.response + '</div>';
-                            }, 750);
-                        }
-                    }
-                });
-            });
-        }
-    });
-</script>
+<script src="../js//index.js"></script>
 
 </html>
