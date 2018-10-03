@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var mysql = require('mysql');
 var fs = require('fs');
+var cookieSession = require('cookie-session');
 var cookieParse = require('cookie-parser');
 var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
