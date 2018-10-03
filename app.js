@@ -24,7 +24,7 @@ app.get('/', function (req, res) {
 app.get('/index', function (req, res) {
     res.sendFile("test.txt", { root: __dirname + "/blog_content" });
 });
-app.get('/getLogin',function(req,res){
+app.get('/getLogin', function (req, res) {
     let loginDom = `<div class="login">
     <h1>
         Sign in
@@ -44,7 +44,7 @@ app.get('/getLogin',function(req,res){
 </div>`
     res.send(loginDom);
 })
-app.get('/getRegister',function(req,res){
+app.get('/getRegister', function (req, res) {
     let registerDom = `<div class="register">
     <h1>
         Join in us
@@ -169,17 +169,8 @@ app.post('/getNewsCount', urlencodeParser, function (req, res) {
 
 
 //文章增
-app.post('/setpassage',urlencodeParser,(req,res)=>{
-    let data = {
-        passage_title: req.body.passage_title,
-        passage_kind: req.body.passage_kind,
-        passage_id: null,
-        passage_url: req.body.passage_url,
-        passage_see: 0,
-        user_id: req.body.user_id,
-        day_see:0,
-    }
-    connection.query('insert into passage set ?', data, function (err, result) {
+app.post('/setpassage', urlencodeParser, (req, res) => {
+    connection.query('select passage_title from passage where user_id = ' + req.body.user_id, data, function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -187,16 +178,54 @@ app.post('/setpassage',urlencodeParser,(req,res)=>{
             });
         }
         else {
-            res.json({
-                "flag": "1"
-            });
+            if(data.length==0){
+                fs.writeFile('./blog_content/'+req.body.user_name+'/'+req.body.passage_title+'.txt',req.body.passage_text,function(err){
+                    if(err){
+                        res.json({
+                            'flag': 0,
+                            'msgs':'上传失败请重试！',
+                        })
+                    }
+                    let data = {
+                        passage_title: req.body.passage_title,
+                        passage_kind: req.body.passage_kind,
+                        passage_id: null,
+                        passage_url:'./blog_content/'+req.body.user_name+'/'+req.body.passage_title+'.txt',
+                        passage_see:0,
+                        user_id: req.cookies.user_id,
+                        day_see:0,
+                    }
+                    connection.query('insert into passage set ?', data, function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            res.json({
+                                "flag": "0"
+                            });
+                        }
+                        else {
+                            res.json({
+                                "flag": "1",
+                                'msgs':'已有此文章请选择修改或删除！',
+                            });
+                        }
+                    })
+                   })
+            }else{
+                res.json({
+                    "flag": "0"
+                    
+                });
+            }
+
         }
     })
+
 })
+
 //文章删
-app.post('/delpassage',urlencodeParser,(req,res)=>{
-    let  id=req.body.user_id
-    connection.query('delete from passage where passage_id='+id, data, function (err, result) {
+app.post('/delpassage', urlencodeParser, (req, res) => {
+    let id = req.body.user_id
+    connection.query('delete from passage where passage_id=' + id, data, function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -213,17 +242,17 @@ app.post('/delpassage',urlencodeParser,(req,res)=>{
 
 app.use(cookieParse());
 app.use(cookieSession({
-    name:'times',
-    keys:[],
-    maxAge:24*3600*1000
+    name: 'times',
+    keys: [],
+    maxAge: 24 * 3600 * 1000
 }));
 //文章展示
-app.post('/titleList',(req,urlencodeParser,res)=>{
-    let u_id=req.body.user_id;
-    let msg=req.body.passage_msg;
-    let p_id= req.body.passage_id;
-    if(u_id){
-        connection.query('select passage_title,passage_id from passage where user_id = '+id, data, function (err, result) {
+app.post('/titleList', (req, urlencodeParser, res) => {
+    let u_id = req.body.user_id;
+    let msg = req.body.passage_msg;
+    let p_id = req.body.passage_id;
+    if (u_id) {
+        connection.query('select passage_title,passage_id from passage where user_id = ' + id, data, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -237,8 +266,8 @@ app.post('/titleList',(req,urlencodeParser,res)=>{
                 res.send(data);
             }
         })
-    }else if(msg){
-        connection.query('select passage_title,passage_id from passage where passage_title like"%'+msg+'%"', data, function (err, result) {
+    } else if (msg) {
+        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"', data, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -252,8 +281,8 @@ app.post('/titleList',(req,urlencodeParser,res)=>{
                 res.send(data);
             }
         })
-    }else if(p_id){
-        connection.query('select passage_url from passage where passage_id ='+p_id, data, function (err, result) {
+    } else if (p_id) {
+        connection.query('select passage_url from passage where passage_id =' + p_id, data, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -265,7 +294,7 @@ app.post('/titleList',(req,urlencodeParser,res)=>{
                     "flag": "1"
                 });
                 res.sendfile(data.passage_url);
-                req.session['passage_see']+=1;
+                req.session['passage_see'] += 1;
             }
         })
     }
@@ -274,14 +303,14 @@ app.post('/titleList',(req,urlencodeParser,res)=>{
 
 //文章更新
 
-app.post('/updatapassage',urlencodeParser,(req,res)=>{
-    let  title=req.body.user_id;
-    let kind =req.body.passage_kind;
-    let url =req.body.passage_url;
-    let arr=[title,kind,url];
-    for(vari=0;i<arr.length;i++){
-        if(title){
-            connection.query('updata passage set passage_title= '+title, data, function (err, result) {
+app.post('/updatapassage', urlencodeParser, (req, res) => {
+    let title = req.body.user_id;
+    let kind = req.body.passage_kind;
+    let url = req.body.passage_url;
+    let arr = [title, kind, url];
+    for (vari = 0; i < arr.length; i++) {
+        if (title) {
+            connection.query('updata passage set passage_title= ' + title, data, function (err, result) {
                 if (err) {
                     console.log(err);
                     res.json({
@@ -292,12 +321,12 @@ app.post('/updatapassage',urlencodeParser,(req,res)=>{
                     res.json({
                         "flag": "1"
                     });
-                    
+
                 }
             })
         }
-        if(kind){
-            connection.query('updata passage set passage_kind= '+title, data, function (err, result) {
+        if (kind) {
+            connection.query('updata passage set passage_kind= ' + title, data, function (err, result) {
                 if (err) {
                     console.log(err);
                     res.json({
@@ -308,12 +337,12 @@ app.post('/updatapassage',urlencodeParser,(req,res)=>{
                     res.json({
                         "flag": "1"
                     });
-                  
+
                 }
             })
         }
-        if(url){
-            connection.query('updata passage set passage_url= '+url, data, function (err, result) {
+        if (url) {
+            connection.query('updata passage set passage_url= ' + url, data, function (err, result) {
                 if (err) {
                     console.log(err);
                     res.json({
@@ -324,7 +353,7 @@ app.post('/updatapassage',urlencodeParser,(req,res)=>{
                     res.json({
                         "flag": "1"
                     });
-                   
+
                 }
             })
         }
@@ -334,22 +363,22 @@ app.post('/updatapassage',urlencodeParser,(req,res)=>{
 
 
 //流量更新
-app.post('/Wcloseupdata',urlencodeParser,function(req,res){
-    let p_id= req.body.passage_id;
-   
-        connection.query('select passage_see from passage where passage_id ='+p_id, data, function (err, result) {
-            if (err) {
-                console.log(err);
-                res.json({
-                    "flag": "0"
-                });
-            }
-            else {
-               data.passage_see=tempsee;
-            }
-        })
-       setTimeout(function(){
-        connection.query('updata passage set passage_see= '+req.session['passage_see']+tempsee, data, function (err, result) {
+app.post('/Wcloseupdata', urlencodeParser, function (req, res) {
+    let p_id = req.body.passage_id;
+
+    connection.query('select passage_see from passage where passage_id =' + p_id, data, function (err, result) {
+        if (err) {
+            console.log(err);
+            res.json({
+                "flag": "0"
+            });
+        }
+        else {
+            data.passage_see = tempsee;
+        }
+    })
+    setTimeout(function () {
+        connection.query('updata passage set passage_see= ' + req.session['passage_see'] + tempsee, data, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -360,11 +389,11 @@ app.post('/Wcloseupdata',urlencodeParser,function(req,res){
                 res.json({
                     "flag": "1"
                 });
-               
+
             }
         })
-       },) 
-    
+    })
+
 });
 
 
