@@ -333,10 +333,10 @@ app.post('/updatapassage',urlencodeParser,(req,res)=>{
 
 
 
-
-app.use('/Wcloseupdata',urlencodeParser,function(req,res){
+//流量更新
+app.post('/Wcloseupdata',urlencodeParser,function(req,res){
     let p_id= req.body.passage_id;
-    pp.post('/updatapassage',urlencodeParser,(req,res)=>{
+   
         connection.query('select passage_see from passage where passage_id ='+p_id, data, function (err, result) {
             if (err) {
                 console.log(err);
