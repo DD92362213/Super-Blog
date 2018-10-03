@@ -84,6 +84,9 @@ document.getElementById('bt1').onmouseout = function () {
     document.querySelector('.visimg').classList.remove('visimg2');
 }
 document.getElementById('bt2').onmouseover = function () {
+    document.querySelector('.text1').classList.remove('fad');
+    document.querySelector('.text1').classList.remove('visitor_cg');
+    document.querySelector('.text1').classList.add('visitor');
     document.querySelector('.text2').classList.add('fad');
     document.querySelector('.text2').classList.add('visitor_cg');
     document.querySelector('.text2').classList.remove('leaguer');
