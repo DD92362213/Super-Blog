@@ -210,6 +210,7 @@ app.post('/setpassage', urlencodeParser, (req, res) => {
                         }
                     })
                    })
+                
             }else{
                 res.json({
                     "flag": "0"
@@ -240,10 +241,10 @@ app.post('/delpassage', urlencodeParser, (req, res) => {
     })
 })
 
-app.use(cookieParse());
+
 app.use(cookieSession({
     name: 'times',
-    keys: [],
+    keys: ['aaa','bbb','ccc','ddd','eee','fff'],
     maxAge: 24 * 3600 * 1000
 }));
 //文章展示
