@@ -110,6 +110,5 @@ bt[1].addEventListener('click',function(){
         bt[0].classList.add('userlv_none'); 
         document.querySelector('.select').classList.add('select_cg');
     },1016)
-    
 });
 

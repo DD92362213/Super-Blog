@@ -111,7 +111,7 @@
 }
 .text_cg{
     display: block!important; 
-    opacity: 0.65 !important; 
+    opacity: 0.50 !important; 
     text-align: center;
     margin-top: 45px;
     font-size: 1.25em;
@@ -135,10 +135,10 @@
     opacity: 0; /*初始状态 透明度为0*/
     }
     50% {
-    opacity: 0.5; /*中间状态 透明度为0*/
+    opacity: 0.25; /*中间状态 透明度为0*/
     }
     100% {
-    opacity: 0.65; /*结尾状态 透明度为1*/
+    opacity: 0.5; /*结尾状态 透明度为1*/
     }
     }
     @keyframes fadeOut {
