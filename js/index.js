@@ -104,9 +104,12 @@ function cg_in (event){
 bt[1].addEventListener('click',function(){
     bt[0].classList.add('disper');
     bt[1].classList.add('slid');
-    setTimeout(function(){
+    let a1;
+    clearTimeout(a1);
+    a1 = setTimeout(function(){
         bt[0].classList.add('userlv_none'); 
         document.querySelector('.select').classList.add('select_cg');
     },1016)
+    
 });
 
