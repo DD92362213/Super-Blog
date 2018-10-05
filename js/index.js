@@ -128,44 +128,46 @@ function sliderAction(e) {
 }
 slider.addEventListener('mousewheel', (e) => sliderAction(e));
 
-document.querySelector('.text1').classList.add('fad');
-document.querySelector('.text1').classList.add('visitor_cg');
-document.querySelector('.text1').classList.remove('visitor');
-document.getElementById('bt1').onmouseover = function () {
-    document.querySelector('.text1').classList.add('fad');
-    document.querySelector('.text1').classList.add('visitor_cg');
-    document.querySelector('.text1').classList.remove('visitor');
-}
-document.getElementById('bt1').onmouseout = function () {
-    document.querySelector('.text1').classList.remove('fad');
-    document.querySelector('.text1').classList.remove('visitor_cg');
-    document.querySelector('.text1').classList.add('visitor');
-    document.querySelector('.visimg').classList.remove('visimg2');
-}
-document.getElementById('bt2').onmouseover = function () {
-    document.querySelector('.text1').classList.remove('fad');
-    document.querySelector('.text1').classList.remove('visitor_cg');
-    document.querySelector('.text1').classList.add('visitor');
-    document.querySelector('.text2').classList.add('fad');
-    document.querySelector('.text2').classList.add('visitor_cg');
-    document.querySelector('.text2').classList.remove('leaguer');
-}
-document.getElementById('bt2').onmouseout = function () {
-    document.querySelector('.text2').classList.remove('fad');
-    document.querySelector('.text2').classList.remove('visitor_cg');
-    document.querySelector('.text2').classList.add('leaguer');
-}
-// ----------------------------------------------------------------------------
-document.getElementById('bt2').onclick = function () {
-    document.querySelector('.visimg').classList.add('fadeOut');
-    userLevel = 1;
-    document.querySelector('.leaimg').classList.add('slid');
-    setTimeout(() => {
-        document.querySelector('.visimg').classList.remove('vis_img');
-        document.querySelector('.visimg').classList.add('visimg1');
-        document.querySelector('.select0').classList.remove('select');
-        document.querySelector('.select0').classList.add('select1');
-        document.querySelector('.leaimg').classList.add('lea_img1');
-    }, 1000);
 
+let text1 = document.querySelector('.text1');
+let text2 = document.querySelector('.text2');
+let bt = document.querySelectorAll('.userlv');
+
+text1.classList.add('text_cg');
+text1.classList.add('fad');
+
+bt[0].addEventListener("mouseover",()=>cg_in(bt[0]));
+bt[1].addEventListener("mouseover",()=>cg_in(bt[1]));
+bt[0].addEventListener("mouseout",()=>cg_in(bt[0]));
+bt[1].addEventListener("mouseout",()=>cg_in(bt[1]));
+
+function cg_in (event){
+        if(event==bt[0]){
+            text2.classList.remove('text_cg');
+            text2.classList.remove('fad');
+            text1.classList.add('text_cg');
+            text1.classList.add('fad');
+            bt[0].classList.add('userlv_cg');
+            bt[1].classList.remove('userlv_cg');
+        }else{
+            text1.classList.remove('text_cg');
+            text1.classList.remove('fad');
+            text2.classList.add('text_cg');
+            text2.classList.add('fad');
+            bt[1].classList.add('userlv_cg');
+            bt[0].classList.remove('userlv_cg');
+        }
+   
 }
+
+bt[1].addEventListener('click',function(){
+    bt[0].classList.add('disper');
+    bt[1].classList.add('slid');
+    let a1;
+    clearTimeout(a1);
+    a1 = setTimeout(function(){
+        bt[0].classList.add('userlv_none'); 
+        document.querySelector('.select').classList.add('select_cg');
+    },1016)
+});
+
