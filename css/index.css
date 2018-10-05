@@ -90,9 +90,20 @@ body{
     display: flex;
     white-space: normal;
     /* width: 100%; */
-    height: 100%;
+    height: auto;
     padding-left: 10px;
+    flex-direction:column; 
     animation: contentBoxAction 1000ms;
+    padding-bottom: 40px;
+}
+.contentBox footer{
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    width: 75vw;
+    height: 35px;
+    background-color: #fff;
+    box-shadow: 5px 0px 10px rgba(0,0,0,.25)
 }
 .loginFinish{
     width: 140vw;
@@ -222,7 +233,7 @@ body{
     align-self: flex-start;
     display: flex;
     border-bottom: 1px solid rgba(255,255,255,.25);
-    animation: passageItemAction 600ms;
+    animation: passageItemAction ease-out 600ms;
 }
 
 .passageTitle,.passageKind,.passageInfo{

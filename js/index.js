@@ -1,24 +1,41 @@
 var ip = 'http://127.0.0.1:3020/';
 var event = new eventEmitter(); //from ajax.js
+const slider = document.querySelector('.sliderBox');
 let animationSolve = (data, data1) => {
     if (data1.srcElement.readyState == 4) {
-        console.log(data1.srcElement)
         if (getCookieItem('loginFlag') == '1') {
             let container = document.querySelector('.container');
             let callBox = document.querySelector('.callBox');
             let userInfo = document.querySelector('.userInfo');
             let passageList = document.querySelector('.passageList');
-            // window.location.href = ip + 'index'
-            // console.log(data.element)
             callBox.classList.add('callBoxLogin');
             container.classList.add('loginAnimation');
-            // userInfo.classList.add('userInfoLogin');
+            // container.onanimationend = () => container.classList.add('loginFinish');
+            // callBox.onanimationend = () =>{
+            //     callBox.classList.remove('callBoxLogin');
+            //     callBox.classList.add('callBoxLogined');
+            // }
+            // passageList.onanimationend = () =>{
+            //     passageList.classList.remove('hiddenList')
+            //     data.right.innerHTML = '<div class="contentBox">' + data1.srcElement.response + '</div>';
+            // }
             setTimeout(function () {
                 container.classList.add('loginFinish');
                 callBox.classList.remove('callBoxLogin');
                 callBox.classList.add('callBoxLogined');
                 passageList.classList.remove('hiddenList')
-                data.right.innerHTML = '<div class="contentBox">' + data1.srcElement.response + '</div>';
+                data.right.innerHTML =
+                    `<div class="contentBox" contenteditable="true">
+                    ${data1.srcElement.response}
+                    <footer>
+                    <nav>
+                        <div>
+                            <input type="file" />
+                        </div>
+                    </nav>
+                </footer>
+                </div>`;
+                event.emit('listshow', { success: 1 });
             }, 750);
         }
     }
@@ -36,15 +53,57 @@ event.on('create', function (data) {
     if (data.flag == 1) {
         document.getElementById('login').addEventListener('click', function () {
             var login = {
+                // userLevel: userLevel,
                 userAccount: document.getElementById('useraccount').value,
                 password: document.getElementById('password').value
             }
             login = JSON.stringify(login);
-            ajax(ip + 'login', 'post', login, (data1) => animationSolve(data, data1));
+            ajax(ip + 'login', 'post', login, (data1) => {
+                animationSolve(data, data1)
+            });
         });
     }
 });
-const slider = document.querySelector('.sliderBox');
+function createListItem(content, i) {
+    let itemTemplate = document.createElement('div');
+    itemTemplate.classList.add('passageItem');
+    itemTemplate.setAttribute('data-itemId', content[i].passage_id);
+    let itemContent =
+        `<div class="passageTitle">
+    <span style="flex:3">${content[i].passage_title}</span>
+    <span>${content[i].user_name}</span>
+</div>
+<div class="passageKind">
+    <span>${content[i].passage_kind}</span>
+</div>
+<div class="passageInfo">
+    <span style="flex:3">${content[i].passage_date}</span>
+    <span>${content[i].passage_good}</span>
+    <span>${content[i].passage_see}</span>
+</div>`
+    itemTemplate.innerHTML = itemContent;
+    slider.appendChild(itemTemplate);
+}
+event.on('listshow', function (flag) {
+    if (flag.success == 1) {
+        ajax(ip + 'titleList', 'post', null, (data) => {
+            let state = data.srcElement.readyState;
+            if (state == 4) {
+                let content = JSON.parse(data.srcElement.response);
+                let itemNum = 0;
+                let cycleTimer = setInterval(() => {
+                    itemNum++;
+                    if (itemNum < content.length) {
+                        createListItem(content,itemNum)
+                    } else {
+                        clearInterval(cycleTimer);
+                    }
+                }, 200);
+
+            }
+        })
+    }
+})
 function sliderAction(e) {
     let timer = undefined;
     clearTimeout(timer);
@@ -99,7 +158,7 @@ document.getElementById('bt2').onmouseout = function () {
 // ----------------------------------------------------------------------------
 document.getElementById('bt2').onclick = function () {
     document.querySelector('.visimg').classList.add('fadeOut');
-
+    userLevel = 1;
     document.querySelector('.leaimg').classList.add('slid');
     setTimeout(() => {
         document.querySelector('.visimg').classList.remove('vis_img');

@@ -10,8 +10,8 @@ var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: '123456',
-    database: 'test'
+    password: '',
+    database: 'android_test'
 })
 var urlencodeParser = bodyParser.urlencoded({
     extended: true,
@@ -76,6 +76,9 @@ app.get('/getRegister', function (req, res) {
 })
 app.get('/register', function (req, res) {
     res.sendFile("register.html", { root: __dirname + "/routes" })
+});
+app.get('/userlevel',function(req,res){
+    
 })
 app.post('/login', urlencodeParser, function (req, res) {
     var data = {
@@ -94,6 +97,7 @@ app.post('/login', urlencodeParser, function (req, res) {
                 // })
                 if(result.length != 0){
                     res.cookie('username', result[0].user_name, {});
+                    res.cookie('user_level', result[0].user_level, {});
                     res.cookie('loginFlag', '1', {});
                     res.redirect("/index");
                 }
@@ -174,7 +178,7 @@ app.post('/getNewsCount', urlencodeParser, function (req, res) {
 
 //文章增
 app.post('/setpassage', urlencodeParser, (req, res) => {
-    connection.query('select passage_title from passage where user_id = ' + req.body.user_id, data, function (err, result) {
+    connection.query('select passage_title from passage where user_id = ' + req.body.user_id, function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -230,7 +234,7 @@ app.post('/setpassage', urlencodeParser, (req, res) => {
 //文章删
 app.post('/delpassage', urlencodeParser, (req, res) => {
     let id = req.body.user_id
-    connection.query('delete from passage where passage_id=' + id, data, function (err, result) {
+    connection.query('delete from passage where passage_id=' + id, function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -252,12 +256,12 @@ app.use(cookieSession({
     maxAge: 24 * 3600 * 1000
 }));
 //文章展示
-app.post('/titleList', (req, urlencodeParser, res) => {
+app.post('/titleList', urlencodeParser,(req,res) => {
     let u_id = req.body.user_id;
     let msg = req.body.passage_msg;
     let p_id = req.body.passage_id;
     if (u_id) {
-        connection.query('select passage_title,passage_id from passage where user_id = ' + id, data, function (err, result) {
+        connection.query('select passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage where user_id = ' + id,  function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -270,9 +274,9 @@ app.post('/titleList', (req, urlencodeParser, res) => {
                 });
                 res.send(data);
             }
-        })
+        });
     } else if (msg) {
-        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"', data, function (err, result) {
+        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"',  function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -287,7 +291,7 @@ app.post('/titleList', (req, urlencodeParser, res) => {
             }
         })
     } else if (p_id) {
-        connection.query('select passage_url from passage where passage_id =' + p_id, data, function (err, result) {
+        connection.query('select passage_url from passage where passage_id =' + p_id,  function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -295,13 +299,23 @@ app.post('/titleList', (req, urlencodeParser, res) => {
                 });
             }
             else {
-                res.json({
-                    "flag": "1"
-                });
                 res.sendfile(data.passage_url);
                 req.session['passage_see'] += 1;
             }
         })
+    }else{
+        connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where passage.user_id = android_test.user_id order by day_see ', function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json(result);
+                
+            }
+        });
     }
 
 })

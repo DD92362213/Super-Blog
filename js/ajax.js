@@ -18,11 +18,10 @@ eventEmitter.prototype.on = function(event,callback){
     this.handler[event].push(callback);
 }
 eventEmitter.prototype.emit = function(event,...data){
-    console.log(data);
     if(this.handler[event].length != 0){
         this.handler[event].map(function(item){
             item(...data);
-        })
+        });
     }
 }
 function debouncing(fn,waitTime){
@@ -35,4 +34,20 @@ function debouncing(fn,waitTime){
             fn.apply(context,arg);
         },waitTime);
     }
+}
+function sleep(fn,time){
+    let timer = undefined;
+    // let result = undefined
+    return new Promise((resolve,reject)=>{
+        // clearTimeout(timer);
+        // result = Promise.resolve();
+        timer = setTimeout(function(){
+            resolve(timer);
+        },time);
+        console.log(time)
+    }).then((timer)=>{
+        // return result.then(()=>{
+            fn.apply(this,arguments)
+        // })
+    })
 }
