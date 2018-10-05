@@ -96,6 +96,12 @@ body{
     animation: contentBoxAction 1000ms;
     padding-bottom: 40px;
 }
+.imageBox{
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .right h2{
     position: fixed;
     top: 0px;
@@ -246,6 +252,7 @@ body{
     align-self: flex-start;
     display: flex;
     border-bottom: 1px solid rgba(255,255,255,.25);
+    cursor: pointer;
     animation: passageItemAction ease-out 600ms;
 }
 

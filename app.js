@@ -16,14 +16,16 @@ var connection = mysql.createConnection({
 var urlencodeParser = bodyParser.urlencoded({
     extended: true,
 });
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '500mb' }));
 app.use(cookieParse());
 app.use(express.static(__dirname));
+app.use(cookieSession({
+    name: 'times',
+    keys: ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff'],
+    maxAge: 24 * 3600 * 1000
+}));
 app.get('/', function (req, res) {
     res.sendFile("index.html", { root: __dirname + "/routes" });
-});
-app.get('/index', function (req, res) {
-    res.sendFile("test.txt", { root: __dirname + "/blog_content" });
 });
 app.get('/getLogin', function (req, res) {
     let loginDom = `<div class="login">
@@ -44,7 +46,7 @@ app.get('/getLogin', function (req, res) {
     </div>
 </div>`
     res.send(loginDom);
-})
+});
 app.get('/getRegister', function (req, res) {
     let registerDom = `<div class="register">
     <h1>
@@ -73,41 +75,59 @@ app.get('/getRegister', function (req, res) {
     </div>
 </div>`
     res.send(registerDom);
-})
+});
 app.get('/register', function (req, res) {
     res.sendFile("register.html", { root: __dirname + "/routes" })
 });
-app.get('/userlevel',function(req,res){
-    
-})
 app.post('/login', urlencodeParser, function (req, res) {
     var data = {
         userAccount: req.body.userAccount,
         password: req.body.password
     }
-    if (data.userAccount) {
-        connection.query('select user_name,user_level from android_test where (iphone = "' + data.userAccount + '" OR email = "' + data.userAccount + '") AND `password` = "' + data.password + '"', function (err, result) {
+    let footer = `<footer>
+        <nav>
+            <div>
+                <input id = "uploadImg" type="file" />
+            </div>
+        </nav>
+    </footer>`
+    if (data.userAccount && data.password) {
+        connection.query('select user_id,user_name,user_level from android_test where (iphone = "' + data.userAccount + '" OR email = "' + data.userAccount + '") AND `password` = "' + data.password + '"', function (err, result) {
             if (err) {
                 res.json({ "flag": "0" });
             }
             else {
-                console.log(result)
-                // res.json({
-                //     flag:1
-                // })
-                if(result.length != 0){
+                if (result.length != 0) {
                     res.cookie('username', result[0].user_name, {});
                     res.cookie('user_level', result[0].user_level, {});
                     res.cookie('loginFlag', '1', {});
-                    res.redirect("/index");
+                    connection.query('select passage_url from passage where user_id = ' + result[0].user_id + ' limit 0,1', function (error, passage) {
+                        if (error) {
+                            console.log(error)
+                        }
+                        fs.readFile(passage[0].passage_url, 'utf8', function (fsError, data) {
+                            if (fsError) {
+                                console.log(fsError);
+                            }
+                            res.json({
+                                data: data ,
+                                footer:footer,
+                                flag: 1
+                            });
+                        });
+                    })
                 }
-                
             }
         });
     } else {
-        res.json({
-            fail: 1
-        })
+        connection.query('select passage_url from passage order by day_see desc limit 0,1', function (err, result) {
+            fs.readFile(result[0].passage_url, 'utf8', function (error, data) {
+                res.json({
+                    data: data,
+                    flag: 0
+                });
+            });
+        });
     }
 
 });
@@ -135,47 +155,9 @@ app.post('/register', urlencodeParser, function (req, res) {
         }
     })
 });
-app.post('/selectAllNews', urlencodeParser, function (req, res) {
-    // res.cookie('user', 'Ashes', {});
-    connection.query('select * from image,news where news.news_id= image.image_id', function (err, result) {
-        if (err) {
-            console.log(err);
-            res.json({ "flag": "0" });
-        }
-        else {
-            res.json(result)
-        }
-    })
+app.post('/uploadImg', urlencodeParser, function (req, res) {
+    console.log(req.body,req.file)
 })
-app.post('/newsDetial', urlencodeParser, function (req, res) {
-    var id = req.body.newID;
-    connection.query('select * from image,news where image.news_id = ' + id + ' and news.news_id = ' + id, function (err, result) {
-        if (err) {
-            console.log(err);
-            res.json({ "flag": "0" });
-        }
-        else {
-            res.json(result[0])
-        }
-    })
-});
-app.post('/getNewsCount', urlencodeParser, function (req, res) {
-    connection.query('select count(`news_id`) as kinds_of_count,news_kind from news group by news_kind', function (err, result) {
-        if (err) {
-            console.log(err);
-            res.json({
-                fail: 1
-            });
-        } else {
-            res.json({
-                success: 1,
-                result: result
-            })
-        }
-    })
-})
-
-
 //文章增
 app.post('/setpassage', urlencodeParser, (req, res) => {
     connection.query('select passage_title from passage where user_id = ' + req.body.user_id, function (err, result) {
@@ -186,22 +168,22 @@ app.post('/setpassage', urlencodeParser, (req, res) => {
             });
         }
         else {
-            if(data.length==0){
-                fs.writeFile('./blog_content/'+req.body.user_name+'/'+req.body.passage_title+'.txt',req.body.passage_text,function(err){
-                    if(err){
+            if (data.length == 0) {
+                fs.writeFile('./blog_content/' + req.body.user_name + '/' + req.body.passage_title + '.txt', req.body.passage_text, function (err) {
+                    if (err) {
                         res.json({
                             'flag': 0,
-                            'msgs':'上传失败请重试！',
+                            'msgs': '上传失败请重试！',
                         })
                     }
                     let data = {
                         passage_title: req.body.passage_title,
                         passage_kind: req.body.passage_kind,
                         passage_id: null,
-                        passage_url:'./blog_content/'+req.body.user_name+'/'+req.body.passage_title+'.txt',
-                        passage_see:0,
+                        passage_url: './blog_content/' + req.body.user_name + '/' + req.body.passage_title + '.txt',
+                        passage_see: 0,
                         user_id: req.cookies.user_id,
-                        day_see:0,
+                        day_see: 0,
                     }
                     connection.query('insert into passage set ?', data, function (err, result) {
                         if (err) {
@@ -213,24 +195,23 @@ app.post('/setpassage', urlencodeParser, (req, res) => {
                         else {
                             res.json({
                                 "flag": "1",
-                                'msgs':'已有此文章请选择修改或删除！',
+                                'msgs': '已有此文章请选择修改或删除！',
                             });
                         }
                     })
-                   })
-                
-            }else{
+                })
+
+            } else {
                 res.json({
                     "flag": "0"
-                    
+
                 });
             }
 
         }
     })
 
-})
-
+});
 //文章删
 app.post('/delpassage', urlencodeParser, (req, res) => {
     let id = req.body.user_id
@@ -249,17 +230,11 @@ app.post('/delpassage', urlencodeParser, (req, res) => {
     })
 })
 
-
-app.use(cookieSession({
-    name: 'times',
-    keys: ['aaa','bbb','ccc','ddd','eee','fff'],
-    maxAge: 24 * 3600 * 1000
-}));
 //文章展示
-app.post('/titleList', urlencodeParser,(req,res) => {
+app.post('/titleList', urlencodeParser, (req, res) => {
     let u_id = req.body.user_id;
     if (u_id) {
-        connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where  passage.user_id = ' + u_id+' and android_test.user_id='+u_id,  function (err, result) {
+        connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where  passage.user_id = ' + u_id + ' and android_test.user_id=' + u_id, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -270,7 +245,7 @@ app.post('/titleList', urlencodeParser,(req,res) => {
                 res.json(result);
             }
         });
-    } else{
+    } else {
         connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where passage.user_id = android_test.user_id order by day_see ', function (err, result) {
             if (err) {
                 console.log(err);
@@ -280,40 +255,40 @@ app.post('/titleList', urlencodeParser,(req,res) => {
             }
             else {
                 res.json(result);
-                
+
             }
         });
     }
 
 });
-app.post('/showPassage',urlencodeParser,(req,res)=>{
+app.post('/showPassage', urlencodeParser, (req, res) => {
     let p_id = req.body.passage_id;
-    if(!p_id){
+    if (!p_id) {
         return;
     }
-    connection.query('select passage_url,passage_title from passage where passage_id = '+p_id,(err,result)=>{
-        if(err){
+    connection.query('select passage_url,passage_title from passage where passage_id = ' + p_id, (err, result) => {
+        if (err) {
             console.log(err);
             res.json('fail')
-        }else{
-            fs.readFile(result[0].passage_url,'utf8',(error,data)=>{
-                if(error){
+        } else {
+            fs.readFile(result[0].passage_url, 'utf8', (error, data) => {
+                if (error) {
                     console.log(error);
                 }
                 res.json({
-                    title:result[0].passage_title,
-                    content:data
+                    title: result[0].passage_title,
+                    content: data
                 });
             });
-            
+
         }
     });
 });
-app.post('/searchPassage',urlencodeParser,(req,res)=>{
+app.post('/searchPassage', urlencodeParser, (req, res) => {
     let msg = req.body.passage_msg;
     let p_title = req.body.passage_title;
     if (msg) {
-        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"',  function (err, result) {
+        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"', function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -328,7 +303,7 @@ app.post('/searchPassage',urlencodeParser,(req,res)=>{
             }
         })
     } else if (p_title) {
-        connection.query('select passage_url from passage where passage_id =' + p_id,  function (err, result) {
+        connection.query('select passage_url from passage where passage_id =' + p_id, function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -341,10 +316,8 @@ app.post('/searchPassage',urlencodeParser,(req,res)=>{
             }
         })
     }
-})
-
+});
 //文章更新
-
 app.post('/updatapassage', urlencodeParser, (req, res) => {
     let title = req.body.user_id;
     let kind = req.body.passage_kind;
@@ -400,10 +373,7 @@ app.post('/updatapassage', urlencodeParser, (req, res) => {
             })
         }
     }
-})
-
-
-
+});
 //流量更新
 app.post('/Wcloseupdata', urlencodeParser, function (req, res) {
     let p_id = req.body.passage_id;
@@ -437,13 +407,9 @@ app.post('/Wcloseupdata', urlencodeParser, function (req, res) {
     })
 
 });
-
-
-
-// app.use(bodyParser.json({ limit: '50mb' }));
 var server = app.listen(3020, function () {
     var host = server.address().address;
     var port = server.address().port;
     // console.log(router);
     console.log('android server started at http://%s%s', host, port)
-})
+});
