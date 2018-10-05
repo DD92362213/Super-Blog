@@ -66,7 +66,7 @@ app.get('/getRegister', function (req, res) {
         <input id="email" placeholder="Your e-mail">
     </div>
     <div>
-        <button id="register">register<tton>
+        <button id="userRegister">register<tton>
     </div>
     <div>
         <button id="cancel">console<tton>
@@ -258,10 +258,8 @@ app.use(cookieSession({
 //文章展示
 app.post('/titleList', urlencodeParser,(req,res) => {
     let u_id = req.body.user_id;
-    let msg = req.body.passage_msg;
-    let p_id = req.body.passage_id;
     if (u_id) {
-        connection.query('select passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage where user_id = ' + id,  function (err, result) {
+        connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where  passage.user_id = ' + u_id+' and android_test.user_id='+u_id,  function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -269,41 +267,10 @@ app.post('/titleList', urlencodeParser,(req,res) => {
                 });
             }
             else {
-                res.json({
-                    "flag": "1"
-                });
-                res.send(data);
+                res.json(result);
             }
         });
-    } else if (msg) {
-        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"',  function (err, result) {
-            if (err) {
-                console.log(err);
-                res.json({
-                    "flag": "0"
-                });
-            }
-            else {
-                res.json({
-                    "flag": "1"
-                });
-                res.send(data);
-            }
-        })
-    } else if (p_id) {
-        connection.query('select passage_url from passage where passage_id =' + p_id,  function (err, result) {
-            if (err) {
-                console.log(err);
-                res.json({
-                    "flag": "0"
-                });
-            }
-            else {
-                res.sendfile(data.passage_url);
-                req.session['passage_see'] += 1;
-            }
-        })
-    }else{
+    } else{
         connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where passage.user_id = android_test.user_id order by day_see ', function (err, result) {
             if (err) {
                 console.log(err);
@@ -318,6 +285,62 @@ app.post('/titleList', urlencodeParser,(req,res) => {
         });
     }
 
+});
+app.post('/showPassage',urlencodeParser,(req,res)=>{
+    let p_id = req.body.passage_id;
+    if(!p_id){
+        return;
+    }
+    connection.query('select passage_url,passage_title from passage where passage_id = '+p_id,(err,result)=>{
+        if(err){
+            console.log(err);
+            res.json('fail')
+        }else{
+            fs.readFile(result[0].passage_url,'utf8',(error,data)=>{
+                if(error){
+                    console.log(error);
+                }
+                res.json({
+                    title:result[0].passage_title,
+                    content:data
+                });
+            });
+            
+        }
+    });
+});
+app.post('/searchPassage',urlencodeParser,(req,res)=>{
+    let msg = req.body.passage_msg;
+    let p_title = req.body.passage_title;
+    if (msg) {
+        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"',  function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.json({
+                    "flag": "1"
+                });
+                res.send(data);
+            }
+        })
+    } else if (p_title) {
+        connection.query('select passage_url from passage where passage_id =' + p_id,  function (err, result) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    "flag": "0"
+                });
+            }
+            else {
+                res.sendfile(data.passage_url);
+                req.session['passage_see'] += 1;
+            }
+        })
+    }
 })
 
 //文章更新

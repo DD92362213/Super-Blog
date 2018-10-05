@@ -91,19 +91,32 @@ body{
     white-space: normal;
     /* width: 100%; */
     height: auto;
-    padding-left: 10px;
+    padding:35px 8px 10px 8px;
     flex-direction:column; 
     animation: contentBoxAction 1000ms;
     padding-bottom: 40px;
 }
-.contentBox footer{
+.right h2{
+    position: fixed;
+    top: 0px;
+    margin: 0px;
+    right: 0px;
+    width: 75vw;
+    height: 55px;
+    font-size:2rem; 
+    text-indent:8px;  
+    background-color: #fff;
+    box-shadow: 5px 0px 10px rgba(0,0,0,.25);
+    border-bottom: 1px solid rgba(0,0,0,.25);
+}
+.right footer{
     position: fixed;
     bottom: 0px;
     right: 0px;
     width: 75vw;
     height: 35px;
     background-color: #fff;
-    box-shadow: 5px 0px 10px rgba(0,0,0,.25)
+    box-shadow: 5px 0px 10px rgba(0,0,0,.25);
 }
 .loginFinish{
     width: 140vw;

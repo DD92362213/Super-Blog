@@ -51,3 +51,11 @@ function sleep(fn,time){
         // })
     })
 }
+function searchParentByClass(thisEle,parent,fn){
+    let classList = [...thisEle.parentElement.classList]; 
+    if(classList.includes(parent)){
+        fn.call(this,thisEle.parentElement);
+    }else{
+        searchParentByClass(thisEle.parentElement,parent,fn);
+    }
+}
