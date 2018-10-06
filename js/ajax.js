@@ -54,8 +54,17 @@ function sleep(fn,time){
 function searchParentByClass(thisEle,parent,fn){
     let classList = [...thisEle.parentElement.classList]; 
     if(classList.includes(parent)){
-        fn.call(this,thisEle.parentElement);
-    }else{
+        if(fn){
+            fn.call(this,thisEle.parentElement);
+        }
+        else{
+            return thisEle.parentElement;
+        }
+    }
+    else if(thisEle.parentElement === document){
+        return document;
+    }
+    else{
         searchParentByClass(thisEle.parentElement,parent,fn);
     }
 }

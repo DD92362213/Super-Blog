@@ -215,6 +215,7 @@ event.on('authorLogin', function (data) {
         fileReader.readAsDataURL(file);
         fileReader.onload = function () {
             img.setAttribute('src', fileReader.result);
+            console.log(searchParentByClass(cursortPosition,'contentBox'))
             if ([...contentBox.children].includes(cursortPosition)) {
                 console.log(cursortPosition)
                 cursortPosition.appendChild(img);
