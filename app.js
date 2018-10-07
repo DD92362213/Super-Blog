@@ -87,6 +87,12 @@ app.post('/login', urlencodeParser, function (req, res) {
     let footer = `<footer>
         <nav>
             <div>
+                <button id="submit">submit</button>
+            </div>
+            <div>
+                <button id="cache">cache</button>
+            </div>
+            <div>
                 <input id = "uploadImg" type="file" />
             </div>
         </nav>
@@ -110,8 +116,8 @@ app.post('/login', urlencodeParser, function (req, res) {
                                 console.log(fsError);
                             }
                             res.json({
-                                data: data ,
-                                footer:footer,
+                                data: data,
+                                footer: footer,
                                 flag: 1
                             });
                         });
@@ -156,8 +162,15 @@ app.post('/register', urlencodeParser, function (req, res) {
     })
 });
 app.post('/uploadImg', urlencodeParser, function (req, res) {
-    console.log(req.body,req.file)
-})
+    let file = req.body.file.split(',')[1];
+    let data = Buffer.from(file, 'base64');
+    let now = Date.now();
+    fs.writeFile(__dirname + '/img/' + now + '.png', data, function (err) {
+        if (err) {
+            console.log(err);
+        }
+    });
+});
 //文章增
 app.post('/setpassage', urlencodeParser, (req, res) => {
     connection.query('select passage_title from passage where user_id = ' + req.body.user_id, function (err, result) {

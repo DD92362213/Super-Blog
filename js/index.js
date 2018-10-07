@@ -4,7 +4,7 @@ const slider = document.querySelector('.sliderBox');
 let text1 = document.querySelector('.text1');
 let text2 = document.querySelector('.text2');
 let bt = document.querySelectorAll('.userlv');
-let cursortPosition = 0;
+let cursortPosition = null;
 text1.classList.add('text_cg');
 text1.classList.add('fad');
 bt[0].addEventListener("mouseover", () => cg_in(bt[0]));
@@ -27,7 +27,7 @@ let animationSolve = (data, data1) => {
             let callBox = document.querySelector('.callBox');
             let userInfo = document.querySelector('.userInfo');
             let passageList = document.querySelector('.passageList');
-            let footer = JSON.parse(data1.srcElement.response).footer?JSON.parse(data1.srcElement.response).footer:'';
+            let footer = JSON.parse(data1.srcElement.response).footer ? JSON.parse(data1.srcElement.response).footer : '';
             callBox.classList.add('callBoxLogin');
             container.classList.add('loginAnimation');
             setTimeout(function () {
@@ -36,7 +36,8 @@ let animationSolve = (data, data1) => {
                 callBox.classList.add('callBoxLogined');
                 passageList.classList.remove('hiddenList')
                 data.right.innerHTML =
-                    `<div class="contentBox" contenteditable="true">
+                    `
+                    <div class="contentBox" contenteditable="true">
                     <h2>Default Passage</h2>
                     ${JSON.parse(data1.srcElement.response).data}    
                 </div>
@@ -145,8 +146,6 @@ event.on('create', function (data) {
             ajax(ip + 'login', 'post', login, (data1) => {
                 if (data1.srcElement.readyState == 4) {
                     animationSolve(data, data1);
-
-
                 }
             });
         });
@@ -205,6 +204,7 @@ event.on('listshow', function (flag) {
 event.on('authorLogin', function (data) {
     let contentBox = document.querySelector('.contentBox');
     if (data.flag == 0) {
+        contentBox.setAttribute('contenteditable', 'false')
         return;
     }
     let uploadImg = document.getElementById('uploadImg');
@@ -215,14 +215,11 @@ event.on('authorLogin', function (data) {
         fileReader.readAsDataURL(file);
         fileReader.onload = function () {
             img.setAttribute('src', fileReader.result);
-            console.log(searchParentByClass(cursortPosition,'contentBox'))
-            if ([...contentBox.children].includes(cursortPosition)) {
-                console.log(cursortPosition)
-                cursortPosition.appendChild(img);
-            }
-            else {
-                contentBox.appendChild(img);
-            }            
+            cursortPosition = cursortPosition === null ?contentBox:cursortPosition;            
+            cursortPosition.appendChild(img);
+            ajax(ip+'uploadImg','post',JSON.stringify({file:fileReader.result}),function(data){
+                
+            })
         }
 
     })
