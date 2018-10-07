@@ -77,6 +77,39 @@ body{
     z-index: 10;
     overflow: auto;
 }
+.searcbox{
+    z-index: 11;
+    position: fixed;
+    top: 0px;
+    margin: 0px;
+    right: 0px;
+    width: 15vw;
+    height: 55px;
+    font-size:2rem; 
+    text-indent:8px;  
+    background-color: white;
+    box-shadow: 5px 0px 10px rgba(0,0,0,.25);
+    border-bottom: 1px solid rgba(0,0,0,.25);
+}
+.search{
+    display: block;
+    height: 55px;
+    width: 15vw;
+}
+.search_cg{
+    display: block;
+    height: 55px;
+    width: 15vw;
+}
+.search:hover{
+    color: white;
+}
+.in{
+    display:none;
+}
+.in_cg{
+    display:block !important;
+}
 .user{
     height: auto;
     background-color: #fff;
