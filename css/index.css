@@ -91,10 +91,10 @@ body{
     white-space: normal;
     /* width: 100%; */
     height: auto;
-    padding:35px 8px 10px 8px;
+    padding:35px 8px 50px 8px;
     flex-direction:column; 
     animation: contentBoxAction 1000ms;
-    padding-bottom: 40px;
+    /* padding-bottom: 40px; */
 }
 .imageBox{
     height: auto;
@@ -120,7 +120,7 @@ body{
     bottom: 0px;
     right: 0px;
     width: 75vw;
-    height: 35px;
+    height: 45px;
     background-color: #fff;
     box-shadow: 5px 0px 10px rgba(0,0,0,.25);
     z-index: 15;
@@ -128,10 +128,58 @@ body{
 .right footer nav{
     flex-direction: row;
     display: flex;
+    height: 100%;
 }
 .right footer nav div{
     flex: 1;
+    display: flex;
     width: auto;
+    justify-content: center;
+    align-items: center;
+    padding-left:8px; 
+    height: 100%;
+}
+.setKind{
+    flex: 4 !important;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+
+}
+.right footer nav div button{
+    background-color: #fff;
+    text-align: center;
+    text-indent: 0em !important;
+    cursor: pointer;
+}
+.setKind input,.right footer nav div button{
+    height: 26px;
+    width: 80%;
+    border-radius: 17px;
+    border: 1px solid rgba(34, 34, 34, .25);
+    outline: none;
+    /* padding-left:2em;  */
+    text-indent: 2em;
+}
+.uploadBox{
+    position: relative !important;
+    flex: 2 !important;
+}
+.uploadBox input{
+    opacity: 0;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 20;
+    height: 100%;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+.uploadBox button{
+    z-index: 19;
+    position: relative !important;
+    justify-self: flex-start !important;
 }
 .loginFinish{
     width: 140vw;

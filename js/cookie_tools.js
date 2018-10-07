@@ -12,9 +12,9 @@ function getCookieItem(key){
             console.log(self.itemStart,self.itemEnd);
             return document.cookie.substring(self.itemStart+1,self.itemEnd);
         }else{
-            return "This item is undefined";
+            return undefined;
         }
     }else{
-        return "cookie is null";
+        return null;
     }
 }

@@ -38,7 +38,7 @@ let animationSolve = (data, data1) => {
                 data.right.innerHTML =
                     `
                     <div class="contentBox" contenteditable="true">
-                    <h2>Default Passage</h2>
+                    <h2 id = "title" contenteditable="true">Default Passage</h2>
                     ${JSON.parse(data1.srcElement.response).data}    
                 </div>
                 ${footer}
@@ -50,11 +50,12 @@ let animationSolve = (data, data1) => {
 }
 function createListItem(content, i, timer) {
     let itemTemplate = document.createElement('div');
+    let date = parseInt(content[i].passage_date);
+    date  = new Date(date)
+    console.log(date)
+    date = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
     itemTemplate.classList.add('passageItem');
-    if (i == content.length) {
-        clearTimeout(timer);
-        return;
-    }
+    
     itemTemplate.setAttribute('data-itemId', content[i].passage_id);
 
     let itemContent =
@@ -66,7 +67,7 @@ function createListItem(content, i, timer) {
     <span>${content[i].passage_kind}</span>
 </div>
 <div class="passageInfo">
-    <span style="flex:3">${content[i].passage_date}</span>
+    <span style="flex:3">${date}</span>
     <span>${content[i].passage_good}</span>
     <span>${content[i].passage_see}</span>
 </div>`
@@ -185,6 +186,10 @@ event.on('listshow', function (flag) {
                 let itemNum = 0;
                 console.log(content)
                 let cycleTimer = setInterval(() => {
+                    if (itemNum == content.length) {
+                        clearTimeout(cycleTimer );
+                        return;
+                    }
                     createListItem(content, itemNum, cycleTimer)
                     itemNum++;
                 }, 200);
@@ -203,10 +208,14 @@ event.on('listshow', function (flag) {
 });
 event.on('authorLogin', function (data) {
     let contentBox = document.querySelector('.contentBox');
+    let title = document.getElementById('title');
+    let kind = document.getElementById('passageKind');
     if (data.flag == 0) {
-        contentBox.setAttribute('contenteditable', 'false')
+        contentBox.setAttribute('contenteditable', 'false');
+        title.setAttribute('contenteditable', 'false');
         return;
     }
+
     let uploadImg = document.getElementById('uploadImg');
     uploadImg.addEventListener('change', function () {
         let file = uploadImg.files[0];
@@ -215,15 +224,32 @@ event.on('authorLogin', function (data) {
         fileReader.readAsDataURL(file);
         fileReader.onload = function () {
             img.setAttribute('src', fileReader.result);
-            cursortPosition = cursortPosition === null ?contentBox:cursortPosition;            
+            cursortPosition = cursortPosition === null ? contentBox : cursortPosition;
             cursortPosition.appendChild(img);
-            ajax(ip+'uploadImg','post',JSON.stringify({file:fileReader.result}),function(data){
-                
+            ajax(ip + 'uploadImg', 'post', JSON.stringify({ file: fileReader.result }), function (data) {
+                if (data.srcElement.readyState == 4) {
+                    img.setAttribute('src', JSON.parse(data.srcElement.response).path);
+                }
             })
         }
 
+    });
+    let submit = document.getElementById('submit');
+    let cache = document.getElementById('cache');
+    let deleteBtn = document.getElementById('delete');
+    submit.addEventListener('click', function () {
+        let uploadInfo = {
+            passage_title: title.innerHTML.replace(/\s*/, ''),
+            passage_content: contentBox.innerHTML,
+            passage_kind: kind.value == '' ? kind.value : 'normal',
+            user_id: getCookieItem('user_id')
+        }
+        uploadInfo = JSON.stringify(uploadInfo);
+        ajax(ip + 'setPassage', 'post', uploadInfo, function (data) {
+            console.log('finish');
+        })
     })
-})
+});
 bt[1].addEventListener('click', function () {
     bt[0].classList.add('disper');
     bt[1].classList.add('slid');
