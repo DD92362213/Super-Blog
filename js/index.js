@@ -3,6 +3,9 @@ var event = new eventEmitter(); //from ajax.js
 const slider = document.querySelector('.sliderBox');
 let text1 = document.querySelector('.text1');
 let text2 = document.querySelector('.text2');
+let searchimg = document.getElementsByClassName('search');
+let searchimg_cg = document.getElementsByClassName('search_cg');
+let textval = document.getElementsByClassName('in');
 let bt = document.querySelectorAll('.userlv');
 let cursortPosition = null;
 text1.classList.add('text_cg');
@@ -36,7 +39,7 @@ let animationSolve = (data, data1) => {
                 callBox.classList.add('callBoxLogined');
                 passageList.classList.remove('hiddenList')
                 data.right.innerHTML =
-                    `
+                    `<div class='searcbox'><input type="text" class='in'><img src="../img/search.png" class='search'></div>
                     <div class="contentBox" contenteditable="true">
                     <h2>Default Passage</h2>
                     ${JSON.parse(data1.srcElement.response).data}    
@@ -44,6 +47,7 @@ let animationSolve = (data, data1) => {
                 ${footer}
                 `;
                 event.emit('listshow', { success: 1, flag: JSON.parse(data1.srcElement.response).flag });
+                event.emit('search_cg',{success:1});
             }, 750);
         }
     }
@@ -233,5 +237,47 @@ bt[1].addEventListener('click', function () {
         bt[0].classList.add('userlv_none');
         document.querySelector('.select').classList.add('select_cg');
     }, 1016)
+});
+
+event.on('search', function (flag) {
+    if (success==1) {
+        searchimg.addEventListener('click',function(){
+            let passage_msg = textval.value; 
+            let contentBox = document.querySelector('.contentBox');
+            ajax(ip + 'searchPassage', 'post', passage_msg, (data) => {
+                let state = data.srcElement.readyState;
+                if (state == 4) {
+                    let content = JSON.parse(data.srcElement.response);
+                    let itemNum = 0;
+                    console.log(content)
+                    let cycleTimer = setInterval(() => {
+                        createListItem(content, itemNum, cycleTimer);
+                        itemNum++;
+                    }, 200);
+        
+                }
+            });
+            contentBox.addEventListener('click', function () {
+                if (typeof window.getSelection == 'undefined') {
+                    alert('浏览器不支持');
+                    return;
+                }
+                let thisPlace = window.getSelection();
+                cursortPosition = thisPlace.focusNode.parentElement;
+            });
+        });
+    }
+});
+event.on('search_cg',()=>{
+    searchimg_cg.addEventListener('click',function(){
+        textval.classList.add('fad');
+        setTimeout(()=>{  
+        textval.classList.add('in_cg');
+        textval.classList.add('search');
+        textval.classList.remove('search_cg');
+        event.emit('search', { success: 1 });
+        },1006)
+        
+    });
 });
 
