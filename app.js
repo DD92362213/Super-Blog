@@ -10,7 +10,7 @@ var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: '123456',
+    password: '',
     database: 'android_test'
 })
 var urlencodeParser = bodyParser.urlencoded({
@@ -87,12 +87,19 @@ app.post('/login', urlencodeParser, function (req, res) {
     let footer = `<footer>
         <nav>
             <div>
-                <button id="submit">submit</button>
+                <button id="submit">Submit</button>
             </div>
             <div>
-                <button id="cache">cache</button>
+                <button id="cache">Cache</button>
             </div>
             <div>
+                <button id="delete">Delete</button>
+            </div>
+            <div class="setKind">
+                <input id = "passageKind" placeholder="Kinds of passage.Default normal">
+            </div>
+            <div class="uploadBox">
+                <button id="upload">Insert Image</button>
                 <input id = "uploadImg" type="file" />
             </div>
         </nav>
@@ -104,6 +111,7 @@ app.post('/login', urlencodeParser, function (req, res) {
             }
             else {
                 if (result.length != 0) {
+                    res.cookie('user_id', result[0].user_id, {});
                     res.cookie('username', result[0].user_name, {});
                     res.cookie('user_level', result[0].user_level, {});
                     res.cookie('loginFlag', '1', {});
@@ -127,6 +135,7 @@ app.post('/login', urlencodeParser, function (req, res) {
         });
     } else {
         connection.query('select passage_url from passage order by day_see desc limit 0,1', function (err, result) {
+            res.cookie('loginFlag', '1', {});
             fs.readFile(result[0].passage_url, 'utf8', function (error, data) {
                 res.json({
                     data: data,
@@ -138,7 +147,7 @@ app.post('/login', urlencodeParser, function (req, res) {
 
 });
 app.post('/register', urlencodeParser, function (req, res) {
-    connection.query('select iphone,email from android_test where iphone = '+req.body.iphone+' or email='+req.body.email, function (err, result) {
+    connection.query('select iphone,email from android_test where iphone = ' + req.body.iphone + ' or email=' + req.body.email, function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -146,101 +155,86 @@ app.post('/register', urlencodeParser, function (req, res) {
             });
         }
         else {
-            if(result.length==0){
-                var data = {
-                    user_name: req.body.user_name,
-                    password: req.body.password,
-                    email: req.body.email,
-                    iphone: req.body.iphone,
-                    user_level: 0,
-                    user_g: 0,
-                }
-                connection.query('insert into android_test set ?', data, function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        res.json({
-                            "flag": "0"
-                        });
-                    }
-                    else {
-                        res.json({
-                            "flag": "1"
-                        });
-                    }
-                })
-            }else{
-                res.json({
-                    "flag": "0",
-                    "msg" : "用户名重复！",
-                });
-            }
+            registe();
         }
-    
+    });
+    function registe() {
+        if (result.length == 0) {
+            var data = {
+                user_name: req.body.user_name,
+                password: req.body.password,
+                email: req.body.email,
+                iphone: req.body.iphone,
+                user_level: 0,
+                user_g: 0,
+            }
+            connection.query('insert into android_test set ?', data, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    res.json({
+                        "flag": "0"
+                    });
+                }
+                else {
+                    res.json({
+                        "flag": "1"
+                    });
+                }
+            })
+        } else {
+            res.json({
+                "flag": "0",
+                "msg": "用户名重复！",
+            });
+        }
+    }
 });
-});
+
+
 app.post('/uploadImg', urlencodeParser, function (req, res) {
     let file = req.body.file.split(',')[1];
     let data = Buffer.from(file, 'base64');
     let now = Date.now();
-    fs.writeFile(__dirname + '/img/' + now + '.png', data, function (err) {
+    let path = '/img/' + now + '.png';
+    fs.writeFile(__dirname + path, data, function (err) {
         if (err) {
             console.log(err);
+        } else {
+            res.json({ path: path });
         }
     });
 });
 //文章增
-app.post('/setpassage', urlencodeParser, (req, res) => {
-    connection.query('select passage_title from passage where user_id = ' + req.body.user_id, function (err, result) {
+app.post('/setPassage', urlencodeParser, (req, res) => {
+    let path = './blog_content/' + req.body.user_id;
+    let body = {
+        passage_id: null,
+        passage_title: req.body.passage_title,
+        passage_kind: req.body.passage_kind,
+        passage_url: path + '/' + req.body.passage_title + '.txt',
+        passage_date: Date.now(),
+        passage_see: 0,
+        passage_good: 0,
+        user_id: req.body.user_id,
+        day_see: 0,
+    }
+    let data = {
+        data: req.body.passage_content
+    }
+    if (fs.exists(path)) {
+        res.send('Passage is existed.');
+    }
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+    }
+    fs.writeFileSync(path + '/' + body.passage_title + '.txt', data.data, function (err) { if (err) { console.log(err); } });
+    connection.query('insert into passage set ?', body, function (err, result) {
         if (err) {
             console.log(err);
-            res.json({
-                "flag": "0"
-            });
-        }
-        else {
-            if (data.length == 0) {
-                fs.writeFile('./blog_content/' + req.body.user_name + '/' + req.body.passage_title + '.txt', req.body.passage_text, function (err) {
-                    if (err) {
-                        res.json({
-                            'flag': 0,
-                            'msgs': '上传失败请重试！',
-                        })
-                    }
-                    let data = {
-                        passage_title: req.body.passage_title,
-                        passage_kind: req.body.passage_kind,
-                        passage_id: null,
-                        passage_url: './blog_content/' + req.body.user_name + '/' + req.body.passage_title + '.txt',
-                        passage_see: 0,
-                        user_id: req.cookies.user_id,
-                        day_see: 0,
-                    }
-                    connection.query('insert into passage set ?', data, function (err, result) {
-                        if (err) {
-                            console.log(err);
-                            res.json({
-                                "flag": "0"
-                            });
-                        }
-                        else {
-                            res.json({
-                                "flag": "1",
-                                'msgs': '已有此文章请选择修改或删除！',
-                            });
-                        }
-                    })
-                })
-
-            } else {
-                res.json({
-                    "flag": "0"
-
-                });
-            }
-
+        } else {
+            res.send('Passage is saved');
         }
     })
-
 });
 //文章删
 app.post('/delpassage', urlencodeParser, (req, res) => {
