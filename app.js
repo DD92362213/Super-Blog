@@ -135,6 +135,7 @@ app.post('/login', urlencodeParser, function (req, res) {
         });
     } else {
         connection.query('select passage_url from passage order by day_see desc limit 0,1', function (err, result) {
+            res.cookie('loginFlag', '1', {});
             fs.readFile(result[0].passage_url, 'utf8', function (error, data) {
                 res.json({
                     data: data,
