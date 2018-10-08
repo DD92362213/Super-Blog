@@ -18,7 +18,7 @@ eventEmitter.prototype.on = function(event,callback){
     this.handler[event].push(callback);
 }
 eventEmitter.prototype.emit = function(event,...data){
-    if(this.handler[event].length != 0){
+    if(this.handler[event]){
         this.handler[event].map(function(item){
             item(...data);
         });

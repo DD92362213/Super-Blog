@@ -3,9 +3,7 @@ var event = new eventEmitter(); //from ajax.js
 const slider = document.querySelector('.sliderBox');
 let text1 = document.querySelector('.text1');
 let text2 = document.querySelector('.text2');
-let searchimg = document.getElementsByClassName('search');
-let searchimg_cg = document.getElementsByClassName('search_cg');
-let textval = document.getElementsByClassName('in');
+let contentBox = document.querySelector('.contentBox');
 let bt = document.querySelectorAll('.userlv');
 let cursortPosition = null;
 text1.classList.add('text_cg');
@@ -14,15 +12,18 @@ bt[0].addEventListener("mouseover", () => cg_in(bt[0]));
 bt[1].addEventListener("mouseover", () => cg_in(bt[1]));
 bt[0].addEventListener("mouseout", () => cg_in(bt[0]));
 bt[1].addEventListener("mouseout", () => cg_in(bt[1]));
-ajax(ip + "getLogin", 'get', null, function (data) {
-    let user = document.querySelector('.user');
-    let right = document.querySelector('.right');
-    let left = document.querySelector('.left');
-    if (data.srcElement.readyState == 4) {
-        user.innerHTML = data.srcElement.response;
-        event.emit('create', { flag: 1, right: right, user: user });
-    }
-});
+ function login(){
+    ajax(ip + "getLogin", 'get', null, function (data) {
+        let user = document.querySelector('.user');
+        let right = document.querySelector('.right');
+        let left = document.querySelector('.left');
+        if (data.srcElement.readyState == 4) {
+            user.innerHTML = data.srcElement.response;
+            event.emit('create', { flag: 1, right: right, user: user });
+        }
+    });
+}
+login();
 let animationSolve = (data, data1) => {
     if (data1.srcElement.readyState == 4) {
         if (getCookieItem('loginFlag') == '1') {
@@ -39,27 +40,26 @@ let animationSolve = (data, data1) => {
                 callBox.classList.add('callBoxLogined');
                 passageList.classList.remove('hiddenList')
                 data.right.innerHTML =
-                    `<div class='searcbox'><input type="text" class='in'><img src="../img/search.png" class='search'></div>
+                    `<div class='searcbox'><input type="text" class='in'><img src="../img/search.png" class='search_cg'></div>
                     <div class="contentBox" contenteditable="true">
-                    <h2 id = "title" contenteditable="true">Default Passage</h2>
+                    <h2>Default Passage</h2>
                     ${JSON.parse(data1.srcElement.response).data}    
                 </div>
                 ${footer}
                 `;
                 event.emit('listshow', { success: 1, flag: JSON.parse(data1.srcElement.response).flag });
-                event.emit('search_cg',{success:1});
+                event.emit('search_cg', { success: 1,flag:JSON.parse(data1.srcElement.response).flag });
             }, 750);
         }
     }
 }
 function createListItem(content, i, timer) {
     let itemTemplate = document.createElement('div');
-    let date = parseInt(content[i].passage_date);
-    date  = new Date(date)
-    console.log(date)
-    date = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
     itemTemplate.classList.add('passageItem');
-    
+    if (i == content.length) {
+        clearTimeout(timer);
+        return;
+    }
     itemTemplate.setAttribute('data-itemId', content[i].passage_id);
 
     let itemContent =
@@ -71,7 +71,7 @@ function createListItem(content, i, timer) {
     <span>${content[i].passage_kind}</span>
 </div>
 <div class="passageInfo">
-    <span style="flex:3">${date}</span>
+    <span style="flex:3">${content[i].passage_date}</span>
     <span>${content[i].passage_good}</span>
     <span>${content[i].passage_see}</span>
 </div>`
@@ -172,11 +172,51 @@ event.on('create', function (data) {
     }
 });
 event.on('registerCreated', function () {
+    let text1=document.getElementById('password');
+    let text2=document.getElementById('rePassword');
+    text2.onblur=function(){
+        if(text1.value==text2.value){
+            text1.classList.remove('register_cg');
+            text2.classList.remove('register_cg');
+        }else{
+            text1.classList.add('register_cg');
+            text2.classList.add('register_cg');
+        }
+    }
+    text1.onblur=function(){
+        if(text1.value==text2.value){
+            text1.classList.remove('register_cg');
+            text2.classList.remove('register_cg');
+        }else{
+            text1.classList.add('register_cg');
+            text2.classList.add('register_cg');
+        }
+    }
     document.getElementById('userRegister').addEventListener('click', function () {
         let registerData = {
-
+        user_name: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+        email: document.getElementById('email').value,
+        iphone:document.getElementById('phone').value,
+        user_level: 0,
+        user_g: 0,
         }
+        let Data=JSON.stringify(registerData);
+        ajax(ip+'register','post',Data,function(data){
+            let state = data.srcElement.readyState;
+            if(state==4){
+               let datas = JSON.parse(data.srcElement.response);
+                if(datas.flag==1){
+
+                }else{
+
+                }
+            }
+        })
     })
+    document.getElementById('cancel').onclick=function(){
+        login();
+    }
 });
 event.on('listshow', function (flag) {
 
@@ -190,10 +230,6 @@ event.on('listshow', function (flag) {
                 let itemNum = 0;
                 console.log(content)
                 let cycleTimer = setInterval(() => {
-                    if (itemNum == content.length) {
-                        clearTimeout(cycleTimer );
-                        return;
-                    }
                     createListItem(content, itemNum, cycleTimer)
                     itemNum++;
                 }, 200);
@@ -212,14 +248,10 @@ event.on('listshow', function (flag) {
 });
 event.on('authorLogin', function (data) {
     let contentBox = document.querySelector('.contentBox');
-    let title = document.getElementById('title');
-    let kind = document.getElementById('passageKind');
     if (data.flag == 0) {
-        contentBox.setAttribute('contenteditable', 'false');
-        title.setAttribute('contenteditable', 'false');
+        contentBox.setAttribute('contenteditable', 'false')
         return;
     }
-
     let uploadImg = document.getElementById('uploadImg');
     uploadImg.addEventListener('change', function () {
         let file = uploadImg.files[0];
@@ -231,29 +263,12 @@ event.on('authorLogin', function (data) {
             cursortPosition = cursortPosition === null ? contentBox : cursortPosition;
             cursortPosition.appendChild(img);
             ajax(ip + 'uploadImg', 'post', JSON.stringify({ file: fileReader.result }), function (data) {
-                if (data.srcElement.readyState == 4) {
-                    img.setAttribute('src', JSON.parse(data.srcElement.response).path);
-                }
+
             })
         }
 
-    });
-    let submit = document.getElementById('submit');
-    let cache = document.getElementById('cache');
-    let deleteBtn = document.getElementById('delete');
-    submit.addEventListener('click', function () {
-        let uploadInfo = {
-            passage_title: title.innerHTML.replace(/\s*/, ''),
-            passage_content: contentBox.innerHTML,
-            passage_kind: kind.value == '' ? kind.value : 'normal',
-            user_id: getCookieItem('user_id')
-        }
-        uploadInfo = JSON.stringify(uploadInfo);
-        ajax(ip + 'setPassage', 'post', uploadInfo, function (data) {
-            console.log('finish');
-        })
     })
-});
+})
 bt[1].addEventListener('click', function () {
     bt[0].classList.add('disper');
     bt[1].classList.add('slid');
@@ -265,11 +280,11 @@ bt[1].addEventListener('click', function () {
     }, 1016)
 });
 
+
 event.on('search', function (flag) {
-    if (success==1) {
-        searchimg.addEventListener('click',function(){
-            let passage_msg = textval.value; 
-            let contentBox = document.querySelector('.contentBox');
+    if (flag.success== 1) {  
+       document.querySelector('.search').addEventListener('click', function () {
+            let passage_msg = document.querySelector('.in').value;
             ajax(ip + 'searchPassage', 'post', passage_msg, (data) => {
                 let state = data.srcElement.readyState;
                 if (state == 4) {
@@ -280,7 +295,7 @@ event.on('search', function (flag) {
                         createListItem(content, itemNum, cycleTimer);
                         itemNum++;
                     }, 200);
-        
+
                 }
             });
             contentBox.addEventListener('click', function () {
@@ -294,16 +309,21 @@ event.on('search', function (flag) {
         });
     }
 });
-event.on('search_cg',()=>{
-    searchimg_cg.addEventListener('click',function(){
-        textval.classList.add('fad');
-        setTimeout(()=>{  
-        textval.classList.add('in_cg');
-        textval.classList.add('search');
-        textval.classList.remove('search_cg');
-        event.emit('search', { success: 1 });
-        },1006)
-        
-    });
+event.on('search_cg', function (flag) {
+    if (flag.success == 1) {
+        document.querySelector('.search_cg').addEventListener('click', function () {
+            let textval = document.querySelector('.in');
+            textval.classList.add('fad');
+            setTimeout(() => {
+                textval.classList.remove('in');
+                textval.classList.add('in_cg');
+                textval.classList.add('search');
+                textval.classList.remove('search_cg');
+                event.emit('search', { success: 1,flag: 1 });
+            }, 1006)
+
+        });
+    }
+
 });
 
