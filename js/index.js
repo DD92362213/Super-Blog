@@ -207,9 +207,9 @@ event.on('registerCreated', function () {
             if(state==4){
                let datas = JSON.parse(data.srcElement.response);
                 if(datas.flag==1){
-
+                    console.log('注册成功！');
                 }else{
-
+                    console.log('注册失败！');
                 }
             }
         })
@@ -281,46 +281,47 @@ bt[1].addEventListener('click', function () {
 });
 
 
-event.on('search', function (flag) {
-    if (flag.success== 1) {  
-       document.querySelector('.search').addEventListener('click', function () {
-            let passage_msg = document.querySelector('.in').value;
-            ajax(ip + 'searchPassage', 'post', passage_msg, (data) => {
-                let state = data.srcElement.readyState;
-                if (state == 4) {
-                    let content = JSON.parse(data.srcElement.response);
-                    let itemNum = 0;
-                    console.log(content)
-                    let cycleTimer = setInterval(() => {
-                        createListItem(content, itemNum, cycleTimer);
-                        itemNum++;
-                    }, 200);
 
-                }
-            });
-            contentBox.addEventListener('click', function () {
-                if (typeof window.getSelection == 'undefined') {
-                    alert('浏览器不支持');
-                    return;
-                }
-                let thisPlace = window.getSelection();
-                cursortPosition = thisPlace.focusNode.parentElement;
-            });
-        });
-    }
-});
+
 event.on('search_cg', function (flag) {
     if (flag.success == 1) {
         document.querySelector('.search_cg').addEventListener('click', function () {
-            let textval = document.querySelector('.in');
-            textval.classList.add('fad');
-            setTimeout(() => {
-                textval.classList.remove('in');
-                textval.classList.add('in_cg');
-                textval.classList.add('search');
-                textval.classList.remove('search_cg');
-                event.emit('search', { success: 1,flag: 1 });
-            }, 1006)
+        // let fg=true;
+        // if(fg){
+        //     fg=false;
+        //     let textval = document.querySelector('.in');
+        //     textval.classList.add('fad');
+        //     setTimeout(() => {
+        //         textval.classList.remove('in');
+        //         textval.classList.add('in_cg');
+        //     }, 1006)
+        // }else{
+            document.querySelector('.search_cg').addEventListener('click', function () {
+                let passage_msg = document.querySelector('.in').value;
+                ajax(ip + 'searchPassage', 'post', passage_msg, (data) => {
+                    let state = data.srcElement.readyState;
+                    if (state == 4) {
+                        let content = JSON.parse(data.srcElement.response);
+                        let itemNum = 0;
+                        console.log(content)
+                        let cycleTimer = setInterval(() => {
+                            createListItem(content, itemNum, cycleTimer);
+                            itemNum++;
+                        }, 200);
+    
+                    }
+                });
+                contentBox.addEventListener('click', function () {
+                    if (typeof window.getSelection == 'undefined') {
+                        alert('浏览器不支持');
+                        return;
+                    }
+                    let thisPlace = window.getSelection();
+                    cursortPosition = thisPlace.focusNode.parentElement;
+                });
+            });
+        // }
+           
 
         });
     }

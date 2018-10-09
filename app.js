@@ -10,7 +10,7 @@ var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: '',
+    password: '123456',
     database: 'android_test'
 })
 var urlencodeParser = bodyParser.urlencoded({
@@ -155,39 +155,37 @@ app.post('/register', urlencodeParser, function (req, res) {
             });
         }
         else {
-            registe();
+            if (result.length == 0) {
+                var data = {
+                    user_name: req.body.user_name,
+                    password: req.body.password,
+                    email: req.body.email,
+                    iphone: req.body.iphone,
+                    user_level: 0,
+                    user_g: 0,
+                }
+                connection.query('insert into android_test set ?', data, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        res.json({
+                            "flag": "0"
+                        });
+                    }
+                    else {
+                        res.json({
+                            "flag": "1"
+                        });
+                    }
+                })
+            } else {
+                res.json({
+                    "flag": "0",
+                    "msg": "用户名重复！",
+                });
+            }
         }
     });
-    function registe() {
-        if (result.length == 0) {
-            var data = {
-                user_name: req.body.user_name,
-                password: req.body.password,
-                email: req.body.email,
-                iphone: req.body.iphone,
-                user_level: 0,
-                user_g: 0,
-            }
-            connection.query('insert into android_test set ?', data, function (err, result) {
-                if (err) {
-                    console.log(err);
-                    res.json({
-                        "flag": "0"
-                    });
-                }
-                else {
-                    res.json({
-                        "flag": "1"
-                    });
-                }
-            })
-        } else {
-            res.json({
-                "flag": "0",
-                "msg": "用户名重复！",
-            });
-        }
-    }
+   
 });
 
 
