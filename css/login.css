@@ -34,6 +34,9 @@
 .register input:hover {
     box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
 }
+.register_cg{
+    box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5);
+}
 
 .login button:hover,.register button:hover {
     box-shadow: 0px 0px 15px rgba(34, 34, 34, 0.2);
