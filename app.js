@@ -288,10 +288,8 @@ app.post('/showPassage', urlencodeParser, (req, res) => {
     });
 });
 app.post('/searchPassage', urlencodeParser, (req, res) => {
-    let msg = req.body.passage_msg;
-    let p_title = req.body.passage_title;
-    if (msg) {
-        connection.query('select passage_title,passage_id from passage where passage_title like"%' + msg + '%"', function (err, result) {
+    let msg = req.body.passage_msg; 
+        connection.query('select user_name,passage_title,passage_id,passage_date,passage_kind,passage_see,passage_good from passage,android_test where  passage.passage_title like"%'+msg+'%"', function (err, result) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -299,26 +297,10 @@ app.post('/searchPassage', urlencodeParser, (req, res) => {
                 });
             }
             else {
-                res.json({
-                    "flag": "1"
-                });
-                res.send(data);
+                console.log(result);
+                res.json(result);
             }
         })
-    } else if (p_title) {
-        connection.query('select passage_url from passage where passage_id =' + p_id, function (err, result) {
-            if (err) {
-                console.log(err);
-                res.json({
-                    "flag": "0"
-                });
-            }
-            else {
-                res.sendfile(data.passage_url);
-                req.session['passage_see'] += 1;
-            }
-        })
-    }
 });
 //文章更新
 app.post('/updatapassage', urlencodeParser, (req, res) => {

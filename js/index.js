@@ -42,9 +42,9 @@ let animationSolve = (data, data1) => {
         callBox.classList.add('callBoxLogined');
         passageList.classList.remove('hiddenList')
         data.right.innerHTML =
-            `<div class='searcbox'><input type="text" class='in'><img src="../img/search.png" class='search'></div>
-                    <div class="contentBox" contenteditable="true">
-                    <h2 id = "title" contenteditable="true">Default Passage</h2>
+        `<div class='searcbox'><input type="text" class='in_cg'><img src="../img/search.png" class='search_cg'></div>
+        <div class="contentBox" contenteditable="true">
+        <h2>Default Passage</h2>
                     ${JSON.parse(data1.srcElement.response).data}    
                 </div>
                 ${footer}
@@ -276,46 +276,24 @@ bt[1].addEventListener('click', function () {
         document.querySelector('.select').classList.add('select_cg');
     }, 1016)
 });
+event.on('search_cg', function () {
+    document.querySelector('.search_cg').addEventListener('click', function () {
+        let passage_msg = document.querySelector('.in_cg').value;
+        let json={'passage_msg':passage_msg}
+        json=JSON.stringify(json);
+        ajax(ip + 'searchPassage', 'post', json, (data) => {
+            let state = data.srcElement.readyState;
+            if (state == 4) {
+                let content = JSON.parse(data.srcElement.response);
+                let itemNum = 0;
+                console.log(content)
+                let cycleTimer = setInterval(() => {
+                    createListItem(content, itemNum, cycleTimer);
+                    itemNum++;
+                }, 200);
 
-// event.on('search', function (flag) {
-//     if (success==1) {
-//         searchimg.addEventListener('click',function(){
-//             let passage_msg = textval.value; 
-//             let contentBox = document.querySelector('.contentBox');
-//             ajax(ip + 'searchPassage', 'post', passage_msg, (data) => {
-//                 let state = data.srcElement.readyState;
-//                 if (state == 4) {
-//                     let content = JSON.parse(data.srcElement.response);
-//                     let itemNum = 0;
-//                     console.log(content)
-//                     let cycleTimer = setInterval(() => {
-//                         createListItem(content, itemNum, cycleTimer);
-//                         itemNum++;
-//                     }, 200);
-
-//                 }
-//             });
-//             // contentBox.addEventListener('click', function () {
-//             //     if (typeof window.getSelection == 'undefined') {
-//             //         alert('浏览器不支持');
-//             //         return;
-//             //     }
-//             //     let thisPlace = window.getSelection();
-//             //     cursortPosition = thisPlace.focusNode.parentElement;
-//             // });
-//         });
-//     }
-// });
-// event.on('search_cg',()=>{
-//     searchimg_cg.addEventListener('click',function(){
-//         textval.classList.add('fad');
-//         setTimeout(()=>{  
-//         textval.classList.add('in_cg');
-//         textval.classList.add('search');
-//         textval.classList.remove('search_cg');
-//         event.emit('search', { success: 1 });
-//         },1006)
-
-//     });
-// });
+            }
+        });
+    });
+});
 
