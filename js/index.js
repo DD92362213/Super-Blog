@@ -13,7 +13,7 @@ bt[0].addEventListener("mouseover", () => cg_in(bt[0]));
 bt[1].addEventListener("mouseover", () => cg_in(bt[1]));
 bt[0].addEventListener("mouseout", () => cg_in(bt[0]));
 bt[1].addEventListener("mouseout", () => cg_in(bt[1]));
-ajax(ip + "getLogin", 'get', null, function (data) {
+function login() {ajax(ip + "getLogin", 'get', null, function (data) {
     let user = document.querySelector('.user');
     let right = document.querySelector('.right');
     let left = document.querySelector('.left');
@@ -21,7 +21,8 @@ ajax(ip + "getLogin", 'get', null, function (data) {
         user.innerHTML = data.srcElement.response;
         event.emit('create', { flag: 1, right: right, user: user });
     }
-});
+});}
+login();
 let animationSolve = (data, data1) => {
     if (data1.srcElement.readyState != 4) {
         return;
@@ -44,17 +45,13 @@ let animationSolve = (data, data1) => {
         data.right.innerHTML =
         `<div class='searcbox'><input type="text" class='in_cg'><img src="../img/search.png" class='search_cg'></div>
         <div class="contentBox" contenteditable="true">
-        <h2>Default Passage</h2>
-                    ${JSON.parse(data1.srcElement.response).data}    
+        <h2 id='title'>Default Passage</h2>
+        ${JSON.parse(data1.srcElement.response).data}    
                 </div>
                 ${footer}
                 `;
         event.emit('listshow', { success: 1, flag: JSON.parse(data1.srcElement.response).flag });
-        event.emit('search_cg', {
-            success: 1,
-            search: document.querySelector('searchImg'),
-            // searchChange: document.querySelector('')
-        });
+        event.emit('search_cg');
     }, 750);
 
 
@@ -73,15 +70,15 @@ function createListItem(content, i, timer) {
         `<div class="passageTitle">
     <span style="flex:3">${content[i].passage_title}</span>
     <span>${content[i].user_name}</span>
-</div>
-<div class="passageKind">
-    <span>${content[i].passage_kind}</span>
-</div>
-<div class="passageInfo">
-    <span style="flex:3">${date}</span>
-    <span>${content[i].passage_good}</span>
-    <span>${content[i].passage_see}</span>
-</div>`
+    </div>
+    <div class="passageKind">
+        <span>${content[i].passage_kind}</span>
+    </div>
+    <div class="passageInfo">
+        <span style="flex:3">${date}</span>
+        <span>${content[i].passage_good}</span>
+        <span>${Math.round(Math.random(1)*10)}</span>
+    </div>`
     itemTemplate.innerHTML = itemContent;
     slider.appendChild(itemTemplate);
 
@@ -179,11 +176,52 @@ event.on('create', function (data) {
     });
 });
 event.on('registerCreated', function () {
+    let text1=document.getElementById('password');
+    let text2=document.getElementById('rePassword');
+    text2.onblur=function(){
+        if(text1.value==text2.value){
+            text1.classList.remove('register_cg');
+            text2.classList.remove('register_cg');
+        }else{
+            text1.classList.add('register_cg');
+            text2.classList.add('register_cg');
+        }
+    }
+    text1.onblur=function(){
+        if(text1.value==text2.value){
+            text1.classList.remove('register_cg');
+            text2.classList.remove('register_cg');
+        }else{
+            text1.classList.add('register_cg');
+            text2.classList.add('register_cg');
+        }
+    }
     document.getElementById('userRegister').addEventListener('click', function () {
         let registerData = {
-
+        user_name: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+        email: document.getElementById('email').value,
+        iphone:document.getElementById('phone').value,
+        user_level: 1,
+        user_g: 0,
         }
+        let Data=JSON.stringify(registerData);
+        ajax(ip+'register','post',Data,function(data){
+            let state = data.srcElement.readyState;
+            if(state==4){
+               let datas = JSON.parse(data.srcElement.response);
+                if(datas.flag==1){
+                    console.log('注册成功！');
+                }else{
+                    
+                    console.log('注册失败！'+datas.flag);
+                }
+            }
+        })
     })
+    document.getElementById('cancel').onclick=function(){
+        login();
+    }
 });
 event.on('listshow', function (flag) {
     if (flag.success != 1) {

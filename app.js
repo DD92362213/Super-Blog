@@ -10,7 +10,7 @@ var ipAddress = '127.0.0.1';
 var connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: '',
+    password: '123456',
     database: 'android_test'
 })
 var urlencodeParser = bodyParser.urlencoded({
@@ -148,8 +148,7 @@ app.post('/login', urlencodeParser, function (req, res) {
 });
 app.post('/register', urlencodeParser, function (req, res) {
     var data = {
-        user_name: req.body.username,
-        user_id: null,
+        user_name: req.body.user_name,
         password: req.body.password,
         email: req.body.email,
         iphone: req.body.iphone,
@@ -362,7 +361,6 @@ app.post('/updatapassage', urlencodeParser, (req, res) => {
 //流量更新
 app.post('/Wcloseupdata', urlencodeParser, function (req, res) {
     let p_id = req.body.passage_id;
-
     connection.query('select passage_see from passage where passage_id =' + p_id, data, function (err, result) {
         if (err) {
             console.log(err);
